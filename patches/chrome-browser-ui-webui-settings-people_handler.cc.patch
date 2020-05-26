@@ -1,5 +1,5 @@
 diff --git a/chrome/browser/ui/webui/settings/people_handler.cc b/chrome/browser/ui/webui/settings/people_handler.cc
-index 57cd1e34ebbc19681692a7e4100677ab0510daea..3beb2136f426fba4c045adde7dda2000fd56c0e5 100644
+index 57cd1e34ebbc19681692a7e4100677ab0510daea..6e2deafc8afc11b94b771acd52d2b1b87e90e7b9 100644
 --- a/chrome/browser/ui/webui/settings/people_handler.cc
 +++ b/chrome/browser/ui/webui/settings/people_handler.cc
 @@ -89,6 +89,7 @@ struct SyncConfigInfo {
@@ -10,15 +10,7 @@ index 57cd1e34ebbc19681692a7e4100677ab0510daea..3beb2136f426fba4c045adde7dda2000
    return current_url == chrome::GetSettingsUrl(chrome::kSyncSetupSubPage);
  }
  
-@@ -330,6 +331,7 @@ void PeopleHandler::RegisterMessages() {
-       "SyncStartKeyRetrieval",
-       base::BindRepeating(&PeopleHandler::HandleStartKeyRetrieval,
-                           base::Unretained(this)));
-+  BRAVE_REGISTER_MESSAGES
- }
- 
- void PeopleHandler::OnJavascriptAllowed() {
-@@ -909,6 +911,7 @@ std::unique_ptr<base::DictionaryValue> PeopleHandler::GetSyncStatusDictionary()
+@@ -909,6 +910,7 @@ std::unique_ptr<base::DictionaryValue> PeopleHandler::GetSyncStatusDictionary()
        service && !disallowed_by_policy && service->IsSetupInProgress() &&
            !service->GetUserSettings()->IsFirstSetupComplete() &&
            identity_manager->HasPrimaryAccount());
