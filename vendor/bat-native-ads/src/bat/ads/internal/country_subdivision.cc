@@ -38,8 +38,8 @@ CountrySubdivision::~CountrySubdivision() = default;
 void CountrySubdivision::FetchCountrySubdivisionIfAllowedForRegion() {
   std::string locale = brave_l10n::LocaleHelper::GetInstance()->GetLocale();
   const std::string region_code = brave_l10n::GetRegionCode(locale);
-  const auto iter = kCountrySubdivisionAllowedForRegions.find(region_code);
-  if (iter == kCountrySubdivisionAllowedForRegions.end()) {
+  const auto iter = kValidSubdivisionCountryCodes.find(region_code);
+  if (iter == kValidSubdivisionCountryCodes.end()) {
     ads_client_->SetSubdivisionAdTargetingRegion(false);
     return;
   }
@@ -57,9 +57,16 @@ std::string CountrySubdivision::GetCountrySubdivision() const {
 
 bool CountrySubdivision::IsValidSubdivisionCountryCode(
     const std::string& country_subdivision_code) const {
-  const auto iter = kValidSubdivisionCountryCodes.find(
-      country_subdivision_code);
+  std::string locale = brave_l10n::LocaleHelper::GetInstance()->GetLocale();
+  const std::string region_code = brave_l10n::GetRegionCode(locale);
+  const auto iter = kValidSubdivisionCountryCodes.find(region_code);
   if (iter == kValidSubdivisionCountryCodes.end()) {
+    return false;
+  }
+
+  auto country_subdivisions = kValidSubdivisionCountryCodes.at(region_code);
+  if (country_subdivisions.find(country_subdivision_code) ==
+      country_subdivisions.end()) {
     return false;
   }
 

@@ -219,7 +219,6 @@ void AdsImpl::InitializeStep5(
   }
 
   ads_serve_->DownloadCatalog();
-  country_subdivision_->FetchCountrySubdivisionIfAllowedForRegion();
 }
 
 #if defined(OS_ANDROID)
@@ -622,6 +621,8 @@ void AdsImpl::ChangeLocale(
   }
 
   LoadUserModel();
+
+  country_subdivision_->FetchCountrySubdivisionIfAllowedForRegion();
 }
 
 void AdsImpl::OnPageLoaded(
