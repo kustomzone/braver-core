@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/preferences/BUILD.gn b/chrome/browser/preferences/BUILD.gn
+index 5491897b9e5a5529308fb734f292ddce3c793253..1d6c02017b88e0f61294dbbed1bd35bd5788ea1c 100644
+--- a/chrome/browser/preferences/BUILD.gn
++++ b/chrome/browser/preferences/BUILD.gn
+@@ -16,6 +16,7 @@ android_library("java") {
+     "android/java/src/org/chromium/chrome/browser/preferences/PrefServiceBridge.java",
+     "android/java/src/org/chromium/chrome/browser/preferences/SharedPreferencesManager.java",
+   ]
++  sources += brave_chrome_browser_preferences_java
+   deps = [
+     "//base:base_java",
+     "//base:jni_java",

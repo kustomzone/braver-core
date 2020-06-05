@@ -1,0 +1,19 @@
+diff --git a/components/browser_ui/site_settings/android/BUILD.gn b/components/browser_ui/site_settings/android/BUILD.gn
+index 894e9a344382745193580ed5accb3611343785a2..43fef8e35d4b509d2141bb949a06225f23acc62b 100644
+--- a/components/browser_ui/site_settings/android/BUILD.gn
++++ b/components/browser_ui/site_settings/android/BUILD.gn
+@@ -98,6 +98,7 @@ android_library("java") {
+     "//ui/android:ui_full_java",
+     "//ui/android:ui_utils_java",
+   ]
++  deps += brave_components_browser_ui_site_settings_android_java_deps sources += brave_components_browser_ui_site_settings_android_java
+ }
+ 
+ android_library("javatests") {
+@@ -203,5 +204,6 @@ android_resources("java_resources") {
+     "//components/permissions/android:java_resources",
+     "//third_party/android_deps:android_support_v7_appcompat_java",
+   ]
++  deps += brave_components_browser_ui_site_settings_android_java_resources_deps sources += brave_components_browser_ui_site_settings_android_java_resources
+   custom_package = "org.chromium.components.browser_ui.site_settings"
+ }

@@ -3,15 +3,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-package org.chromium.chrome.browser.site_settings;
+package org.chromium.components.browser_ui.site_settings;
 
 import android.os.Bundle;
 import androidx.preference.Preference;
 
 import org.chromium.base.ContextUtils;
-import org.chromium.chrome.R;
 import org.chromium.components.browser_ui.settings.SettingsUtils;
-import org.chromium.chrome.browser.settings.BravePreferenceFragment;
+import org.chromium.components.browser_ui.settings.BravePreferenceFragment;
 
 import java.util.HashMap;
 

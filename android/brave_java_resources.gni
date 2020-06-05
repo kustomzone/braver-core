@@ -706,20 +706,23 @@ brave_java_resources = [
   "java/res/xml/background_images_preferences.xml",
   "java/res/xml/developer_preferences.xml",
   "java/res/xml/use_custom_tabs_brave_preference.xml",
-  "java/res/xml/play_yt_video_in_browser_preferences.xml",
   "java/res/xml/brave_theme_preferences.xml",
   "java/res/xml/brave_license_preferences.xml",
-  "java/res/xml/desktop_mode_preferences.xml",
   "java/res/xml/legal_information_preferences.xml",
   "java/res/xml/qa_preferences.xml",
   "java/res/xml/brave_rewards_preferences.xml",
   "java/res/xml/closing_all_tabs_closes_brave_preference.xml",
   "java/res/xml/clear_browsing_data_preferences_tab.xml",
-  "java/res/xml/brave_site_settings_preferences.xml",
   "java/res/xml/brave_privacy_preferences.xml",
   "java/res/xml/appearance_preferences.xml",
 ]
 
 brave_components_browser_ui_settings_android_java_resources = [
   "java/res/menu/exit_settings_menu.xml",
+]
+
+brave_components_browser_ui_site_settings_android_java_resources = [
+  "java/res/xml/brave_site_settings_preferences.xml",
+  "java/res/xml/desktop_mode_preferences.xml",
+  "java/res/xml/play_yt_video_in_browser_preferences.xml",
 ]

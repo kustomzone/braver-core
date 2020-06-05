@@ -79,7 +79,6 @@ brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/partnercustomizations/BravePartnerBrowserCustomizations.java",
   "../../brave/android/java/org/chromium/chrome/browser/partnercustomizations/CloseBraveManager.java",
   "../../brave/android/java/org/chromium/chrome/browser/preferences/BravePreferenceKeys.java",
-  "../../brave/android/java/org/chromium/chrome/browser/preferences/BravePrefServiceBridge.java",
   "../../brave/android/java/org/chromium/chrome/browser/preferences/BraveSyncScreensObserver.java",
   "../../brave/android/java/org/chromium/chrome/browser/preferences/website/BraveShieldsContentSettings.java",
   "../../brave/android/java/org/chromium/chrome/browser/preferences/website/BraveShieldsContentSettingsObserver.java",
@@ -109,9 +108,6 @@ brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/settings/SearchEngineTabModelSelectorObserver.java",
   "../../brave/android/java/org/chromium/chrome/browser/settings/themes/BraveRadioButtonGroupCustomHomepageThemePreference.java",
   "../../brave/android/java/org/chromium/chrome/browser/signin/BraveSigninManager.java",
-  "../../brave/android/java/org/chromium/chrome/browser/site_settings/BraveSiteSettingsPreferencesBase.java",
-  "../../brave/android/java/org/chromium/chrome/browser/site_settings/DesktopModePreferences.java",
-  "../../brave/android/java/org/chromium/chrome/browser/site_settings/PlayYTVideoInBrowserPreferences.java",
   "../../brave/android/java/org/chromium/chrome/browser/sync/BraveSyncService.java",
   "../../brave/android/java/org/chromium/chrome/browser/sync/BraveSyncServiceObserver.java",
   "../../brave/android/java/org/chromium/chrome/browser/toolbar/BraveHomeButton.java",
@@ -152,4 +148,14 @@ if (brave_ads_enabled) {
 
 brave_components_browser_ui_settings_android_java = [
   "//brave/components/browser_ui/settings/android/java/src/org/chromium/components/browser_ui/settings/BravePreferenceFragment.java",
+]
+
+brave_components_browser_ui_site_settings_android_java = [
+  "//brave/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/BraveSiteSettingsPreferencesBase.java",
+  "//brave/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/DesktopModePreferences.java",
+  "//brave/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/PlayYTVideoInBrowserPreferences.java",
+]
+
+brave_chrome_browser_preferences_java = [
+  "//brave/android/java/org/chromium/chrome/browser/preferences/BravePrefServiceBridge.java",
 ]

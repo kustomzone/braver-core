@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.annotations.NativeMethods;
-import org.chromium.chrome.browser.profiles.Profile;
 
 @JNINamespace("chrome::android")
 public class BravePrefServiceBridge {
@@ -72,15 +71,15 @@ public class BravePrefServiceBridge {
         return BravePrefServiceBridgeJni.get().getBackgroundVideoPlaybackEnabled();
     }
 
-    public long getTrackersBlockedCount(Profile profile) {
+    public long getTrackersBlockedCount(Object profile) {
         return BravePrefServiceBridgeJni.get().getTrackersBlockedCount(profile);
     }
 
-    public long getAdsBlockedCount(Profile profile) {
+    public long getAdsBlockedCount(Object profile) {
         return BravePrefServiceBridgeJni.get().getAdsBlockedCount(profile);
     }
 
-    public long getDataSaved(Profile profile) {
+    public long getDataSaved(Object profile) {
         return BravePrefServiceBridgeJni.get().getDataSaved(profile);
     }
 
@@ -123,15 +122,15 @@ public class BravePrefServiceBridge {
         return BravePrefServiceBridgeJni.get().getUseRewardsStagingServer();
     }
 
-    public void setOldTrackersBlockedCount(Profile profile, long count) {
+    public void setOldTrackersBlockedCount(Object profile, long count) {
         BravePrefServiceBridgeJni.get().setOldTrackersBlockedCount(profile, count);
     }
 
-    public void setOldAdsBlockedCount(Profile profile, long count) {
+    public void setOldAdsBlockedCount(Object profile, long count) {
         BravePrefServiceBridgeJni.get().setOldAdsBlockedCount(profile, count);
     }
 
-    public void setOldHttpsUpgradesCount(Profile profile, long count) {
+    public void setOldHttpsUpgradesCount(Object profile, long count) {
         BravePrefServiceBridgeJni.get().setOldHttpsUpgradesCount(profile, count);
     }
 
@@ -223,15 +222,15 @@ public class BravePrefServiceBridge {
         void setBackgroundVideoPlaybackEnabled(boolean enabled);
         boolean getBackgroundVideoPlaybackEnabled();
 
-        long getTrackersBlockedCount(Profile profile);
-        long getAdsBlockedCount(Profile profile);
-        long getDataSaved(Profile profile);
+        long getTrackersBlockedCount(Object profile);
+        long getAdsBlockedCount(Object profile);
+        long getDataSaved(Object profile);
 
         // Used to pass total stat from upgrading old tabs based browser
         // to a new core based
-        void setOldTrackersBlockedCount(Profile profile, long count);
-        void setOldAdsBlockedCount(Profile profile, long count);
-        void setOldHttpsUpgradesCount(Profile profile, long count);
+        void setOldTrackersBlockedCount(Object profile, long count);
+        void setOldAdsBlockedCount(Object profile, long count);
+        void setOldHttpsUpgradesCount(Object profile, long count);
 
         String getSyncDeviceId();
 
