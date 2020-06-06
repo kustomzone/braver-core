@@ -495,3 +495,9 @@ if (is_mac) {
     ]
   }
 }
+
+action("audit_deps") {
+  script = "//brave/script/audit_deps.py"
+
+  outputs = [ "$root_gen_dir/non-existent-audit_deps" ]
+}

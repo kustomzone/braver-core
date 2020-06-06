@@ -51,12 +51,13 @@ def npm_audit(path, args):
     if os.path.isfile(os.path.join(path, 'package.json')) and \
        os.path.isfile(os.path.join(path, 'package-lock.json')) and \
        os.path.isdir(os.path.join(path, 'node_modules')):
-        print('Auditing %s' % path)
+        print('Auditing (npm) %s' % path)
         return audit_deps(path, args)
-    else:
-        print('Skipping audit of "%s" (no package.json or node_modules '
-              'directory found)' % path)
-        return 0
+    elif os.path.isfile(os.path.join(path, 'Cargo.toml')):
+        print('Auditing (cargo) %s' % path)
+        return 0  # TODO
+
+    return 0
 
 
 def audit_deps(path, args):
