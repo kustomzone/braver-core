@@ -8,4 +8,4 @@ Brave browser without the token and adware.
 
 [Join Braver on Discord](https://discord.gg/XMAyYA4)
 
-Braver Core is a set of changes, APIs, and scripts used for customizing Chromium to make Brave.
+Braver Core is a set of changes, APIs, and scripts used for customizing Chromium to make Braver.
