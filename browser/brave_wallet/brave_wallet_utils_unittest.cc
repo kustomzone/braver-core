@@ -21,50 +21,43 @@
 #include "extensions/common/extension_builder.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-class BraveWalletUtilsUnitTest : public testing::Test
-{
-public:
-  void SetUp() override
-  {
+class BraveWalletUtilsUnitTest : public testing::Test {
+ public:
+  void SetUp() override {
     profile_ = CreateProfile();
   }
 
-  Profile *profile()
-  {
+  Profile* profile() {
     return profile_.get();
   }
 
-  void AddCryptoWallets()
-  {
+  void AddCryptoWallets() {
     AddExtension(ethereum_remote_client_extension_id,
-                 &crypto_wallets_extension);
+        &crypto_wallets_extension);
   }
 
-  void AddMetaMask()
-  {
+  void AddMetaMask() {
     AddExtension(metamask_extension_id, &metamask_extension);
   }
 
-private:
-  void AddExtension(const std::string &extension_id,
-                    scoped_refptr<const extensions::Extension> *extension)
-  {
+ private:
+  void AddExtension(const std::string& extension_id,
+       scoped_refptr<const extensions::Extension> *extension) {
     extensions::DictionaryBuilder manifest;
     manifest.Set("name", "ext")
         .Set("version", "0.1")
         .Set("manifest_version", 2);
     *extension = extensions::ExtensionBuilder()
-                     .SetManifest(manifest.Build())
-                     .SetID(extension_id)
-                     .Build();
+        .SetManifest(manifest.Build())
+        .SetID(extension_id)
+        .Build();
     ASSERT_TRUE(extension->get());
     extensions::ExtensionPrefs::Get(profile())->UpdateExtensionPref(
         extension_id, "test", std::make_unique<base::Value>(""));
     extensions::ExtensionRegistry::Get(profile())->AddEnabled(extension->get());
   }
 
-  std::unique_ptr<TestingProfile> CreateProfile()
-  {
+  std::unique_ptr<TestingProfile> CreateProfile() {
     TestingProfile::Builder builder;
     auto prefs =
         std::make_unique<sync_preferences::TestingPrefServiceSyncable>();
@@ -80,8 +73,7 @@ private:
 };
 
 // If Crypto Wallets was disabled and MetaMask is installed, set to MetaMask
-TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationMMCryptoWalletsDisabled)
-{
+TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationMMCryptoWalletsDisabled) {
   AddMetaMask();
   profile()->GetPrefs()->SetBoolean(kBraveWalletEnabledDeprecated, false);
 
@@ -93,8 +85,7 @@ TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationMMCryptoWalletsDisabled)
 }
 
 // If Crypto Wallets is diabled, and MetaMask not installed, set None
-TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationCryptoWalletsDisabled)
-{
+TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationCryptoWalletsDisabled) {
   AddCryptoWallets();
   profile()->GetPrefs()->SetBoolean(kBraveWalletEnabledDeprecated, false);
 
@@ -106,24 +97,22 @@ TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationCryptoWalletsDisabled)
 }
 
 // If Crypto Wallets is enabled, and MetaMask is installed, set
-// to Metamask
-TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationCryptoWalletsAndMMInstalled)
-{
+// to Crypto Wallets
+TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationCryptoWalletsAndMMInstalled) {
   profile()->GetPrefs()->SetBoolean(kBraveWalletEnabledDeprecated, true);
-  AddMetaMask();
   AddCryptoWallets();
+  AddMetaMask();
 
   brave_wallet::MigrateBraveWalletPrefs(profile());
 
   auto provider = static_cast<BraveWalletWeb3ProviderTypes>(
       profile()->GetPrefs()->GetInteger(kBraveWalletWeb3Provider));
-  ASSERT_EQ(provider, BraveWalletWeb3ProviderTypes::METAMASK);
+  ASSERT_EQ(provider, BraveWalletWeb3ProviderTypes::CRYPTO_WALLETS);
 }
 
 // If CryptoWallets is enabled and installed, but MetaMask is not
 // installed, set Crypto Wallets.
-TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationCryptoWalletsInstalled)
-{
+TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationCryptoWalletsInstalled) {
   profile()->GetPrefs()->SetBoolean(kBraveWalletEnabledDeprecated, true);
   AddCryptoWallets();
 
@@ -136,8 +125,7 @@ TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationCryptoWalletsInstalled)
 
 // If CryptoWallets is enabled and not installed yet, and MetaMask is not
 // installed, set Ask
-TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationNothingInstalled)
-{
+TEST_F(BraveWalletUtilsUnitTest, TestPrefMigrationNothingInstalled) {
   profile()->GetPrefs()->SetBoolean(kBraveWalletEnabledDeprecated, true);
 
   brave_wallet::MigrateBraveWalletPrefs(profile());
