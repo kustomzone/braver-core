@@ -103,9 +103,9 @@ class NewTabPage extends React.Component<Props, State> {
     this.props.actions.showGridSiteRemovedNotification(false)
     this.imageSource = GetBackgroundImageSrc(this.props)
     this.trackCachedImage()
-    if (GetShouldShowBrandedWallpaperNotification(this.props)) {
-      this.trackBrandedWallpaperNotificationAutoDismiss()
-    }
+    // if (GetShouldShowBrandedWallpaperNotification(this.props)) {
+    //   this.trackBrandedWallpaperNotificationAutoDismiss()
+    // }
   }
 
   componentDidUpdate (prevProps: Props) {
@@ -120,22 +120,23 @@ class NewTabPage extends React.Component<Props, State> {
       // reset loaded state
       this.setState({ backgroundHasLoaded: false })
     }
-    if (!GetShouldShowBrandedWallpaperNotification(prevProps) &&
-        GetShouldShowBrandedWallpaperNotification(this.props)) {
-      this.trackBrandedWallpaperNotificationAutoDismiss()
-    }
+    // if (!GetShouldShowBrandedWallpaperNotification(prevProps) &&
+    //     GetShouldShowBrandedWallpaperNotification(this.props)) {
+    //   this.trackBrandedWallpaperNotificationAutoDismiss()
+    // }
 
-    if (GetShouldShowBrandedWallpaperNotification(prevProps) &&
-        !GetShouldShowBrandedWallpaperNotification(this.props)) {
-      this.stopWaitingForBrandedWallpaperNotificationAutoDismiss()
-    }
+    // if (GetShouldShowBrandedWallpaperNotification(prevProps) &&
+    //     !GetShouldShowBrandedWallpaperNotification(this.props)) {
+    //   this.stopWaitingForBrandedWallpaperNotificationAutoDismiss()
+    // }
 
     // Handles updates from brave://settings/newTab
     const oldShowRewards = prevProps.newTabData.showRewards
     const oldShowBinance = prevProps.newTabData.showBinance
     const oldShowTogether = prevProps.newTabData.showTogether
-    const { showRewards, showBinance, showTogether } = this.props.newTabData
-
+    const showRewards = false;
+    const showBinance = false;
+    const showTogether = false;
     if (!oldShowRewards && showRewards) {
       this.props.actions.setForegroundStackWidget('rewards')
     } else if (!oldShowBinance && showBinance) {
@@ -507,6 +508,7 @@ class NewTabPage extends React.Component<Props, State> {
   }
 
   renderRewardsWidget (showContent: boolean) {
+    return null;
     const { newTabData } = this.props
     const {
       rewardsState,
@@ -549,6 +551,7 @@ class NewTabPage extends React.Component<Props, State> {
   }
 
   renderTogetherWidget (showContent: boolean) {
+    return null;
     const { newTabData } = this.props
     const { showTogether, textDirection, togetherSupported } = newTabData
 
@@ -570,6 +573,7 @@ class NewTabPage extends React.Component<Props, State> {
   }
 
   renderBinanceWidget (showContent: boolean) {
+    return null;
     const { newTabData } = this.props
     const { binanceState, showBinance, textDirection } = newTabData
     const menuActions = { onLearnMore: this.learnMoreBinance }
@@ -714,7 +718,7 @@ class NewTabPage extends React.Component<Props, State> {
               textDirection={newTabData.textDirection}
               onClickSettings={this.toggleSettings}
               backgroundImageInfo={newTabData.backgroundImage}
-              showPhotoInfo={!isShowingBrandedWallpaper && newTabData.showBackgroundImage}
+              showPhotoInfo={false}
             />
             </Page.FooterContent>
           </Page.Footer>

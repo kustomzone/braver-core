@@ -55,9 +55,9 @@ source_set("utility") {
     deps += [ "//brave/components/services/tor" ]
   }
 
-  if (brave_ads_enabled) {
-    deps += [ "//brave/components/services/bat_ads:lib" ]
-  }
+  # if (brave_ads_enabled) {
+  #   deps += [ "//brave/components/services/bat_ads:lib" ]
+  # }
 
   if (brave_rewards_enabled) {
     deps += [ "//brave/components/services/bat_ledger:lib" ]

@@ -29,16 +29,16 @@ void MigrateBraveWalletPrefs_V0_V1(Profile* profile) {
 
   BraveWalletWeb3ProviderTypes provider =
       BraveWalletWeb3ProviderTypes::ASK;
-  if (!wallet_was_enabled&& has_metamask) {
-    // If Crypto Wallets was disabled and MetaMask is installed, set to MetaMask
+  if (has_metamask) {
+    // If Metamask is installed, set to Metamask
     provider = BraveWalletWeb3ProviderTypes::METAMASK;
   } else if (!wallet_was_enabled && !has_metamask) {
     // If Crypto Wallets is diabled, and MetaMask not installed, set None
     provider = BraveWalletWeb3ProviderTypes::NONE;
   } else if (wallet_was_enabled && has_metamask) {
     // If Crypto Wallets is enabled, and MetaMask is installed, set
-    // to Crypto Wallets
-    provider = BraveWalletWeb3ProviderTypes::CRYPTO_WALLETS;
+    // to Metamask
+    provider = BraveWalletWeb3ProviderTypes::METAMASK;
   } else if (has_crypto_wallets && wallet_was_enabled) {
     // If CryptoWallets is enabled and installed, but MetaMask is not
     // installed, set Crypto Wallets.

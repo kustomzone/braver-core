@@ -49,17 +49,17 @@ ViewCounterServiceFactory::~ViewCounterServiceFactory() {}
 KeyedService* ViewCounterServiceFactory::BuildServiceInstanceFor(
     content::BrowserContext* browser_context) const {
   // Only NTP in normal profile uses sponsored services.
-  if (browser_context->IsOffTheRecord())
+  // if (browser_context->IsOffTheRecord())
     return nullptr;
 
   if (auto* service =
           g_brave_browser_process->ntp_background_images_service()) {
     Profile* profile = Profile::FromBrowserContext(browser_context);
     bool is_supported_locale = false;
-    if (auto* ads_service =
-            brave_ads::AdsServiceFactory::GetForProfile(profile)) {
-      is_supported_locale = ads_service->IsSupportedLocale();
-    }
+    // if (auto* ads_service =
+    //         brave_ads::AdsServiceFactory::GetForProfile(profile)) {
+    //   is_supported_locale = ads_service->IsSupportedLocale();
+    // }
     content::URLDataSource::Add(
         browser_context,
         std::make_unique<NTPBackgroundImagesSource>(service));

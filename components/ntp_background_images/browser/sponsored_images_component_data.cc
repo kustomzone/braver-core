@@ -14,11 +14,7 @@ namespace ntp_background_images {
 base::Optional<SponsoredImagesComponentData> GetSponsoredImagesComponentData(
     const std::string& region) {
   if (base::FeatureList::IsEnabled(features::kBraveNTPBrandedWallpaperDemo)) {
-    static const SponsoredImagesComponentData demo_data = {
-        "DEMO",
-        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw+cUN/flbETi5zyjp4tRW4ustichzvFqeY4ayWpi/r+TwRgUaf0IyK2GYZF1xBsiuGO3B321ptcF7lpru32dxc2GUX7GLVHnYw+kM9bfw3WVqLPXVozCbyjqCW8IQXuUljOJ4tD9gJe8xvBeZ/WKg2K+7sYuhov6mcbBoUd4WLZW+89ryuBfZFi/4U6MX4Hemsw40Z3KHf/gAHpXXeU65Sqb8AhVMp0nckaX5u4vN09OTHLPAmCZmps5TcExoYwSPQaFK+6HrUV0/66Xw3kqo05CvN3bCC1UlDk3KAffg3LZ8u1E3gFcwK6xSjHYknGOuxabTVS6cNGECOEWKVsURwIDAQAB",  // NOLINT
-        "bejfdgcfgammhkbdmbaohoknehcdnbmn"
-    };
+    static const SponsoredImagesComponentData demo_data = {};
     return demo_data;
   }
 

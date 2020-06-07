@@ -27,18 +27,18 @@ WebcompatReportUploader::WebcompatReportUploader(
 WebcompatReportUploader::~WebcompatReportUploader() {}
 
 void WebcompatReportUploader::SubmitReport(std::string report_domain) {
-  std::string api_key = brave::GetAPIKey();
+  // std::string api_key = brave::GetAPIKey();
 
-  GURL upload_url(WEBCOMPAT_REPORT_ENDPOINT);
+  // GURL upload_url(WEBCOMPAT_REPORT_ENDPOINT);
 
-  base::Value post_data_obj(base::Value::Type::DICTIONARY);
-  post_data_obj.SetKey("domain", base::Value(report_domain));
-  post_data_obj.SetKey("api_key", base::Value(api_key));
+  // base::Value post_data_obj(base::Value::Type::DICTIONARY);
+  // post_data_obj.SetKey("domain", base::Value(report_domain));
+  // post_data_obj.SetKey("api_key", base::Value(api_key));
 
-  std::string post_data;
-  base::JSONWriter::Write(post_data_obj, &post_data);
+  // std::string post_data;
+  // base::JSONWriter::Write(post_data_obj, &post_data);
 
-  WebcompatReportUploader::CreateAndStartURLLoader(upload_url, post_data);
+  // WebcompatReportUploader::CreateAndStartURLLoader(upload_url, post_data);
 }
 
 void WebcompatReportUploader::CreateAndStartURLLoader(

@@ -151,21 +151,21 @@ export default class Settings extends React.PureComponent<Props, State> {
       toggleShowClock,
       toggleShowStats,
       toggleShowTopSites,
-      toggleShowRewards,
-      toggleShowTogether,
-      toggleBrandedWallpaperOptIn,
+      // toggleShowRewards,
+      // toggleShowTogether,
+      // toggleBrandedWallpaperOptIn,
       showBackgroundImage,
       showStats,
       showClock,
       showTopSites,
-      showRewards,
-      showTogether,
-      brandedWallpaperOptIn,
-      allowSponsoredWallpaperUI,
-      toggleShowBinance,
-      showBinance,
-      binanceSupported,
-      togetherSupported
+      // showRewards,
+      // showTogether,
+      // brandedWallpaperOptIn,
+      // allowSponsoredWallpaperUI,
+      // toggleShowBinance,
+      // showBinance,
+      // binanceSupported,
+      // togetherSupported
     } = this.props
     const { activeTab } = this.state
 
@@ -188,9 +188,9 @@ export default class Settings extends React.PureComponent<Props, State> {
                 {
                   this.activeTabOptions.map((tabName, index) => {
                     const name = index === (this.activeTabOptions.length - 1) ? tabName : `show${tabName}`
-                    if (index === 0 && !allowSponsoredWallpaperUI) {
-                      return <div key={`sidebar-button=${index}`} />
-                    }
+                    // if (index === 0 && !allowSponsoredWallpaperUI) {
+                    //   return <div key={`sidebar-button=${index}`} />
+                    // }
                     return (
                       <SettingsSidebarButton
                         tabIndex={0}
@@ -215,9 +215,9 @@ export default class Settings extends React.PureComponent<Props, State> {
                   activeTab === 0
                     ? (
                     <BackgroundImageSettings
-                      toggleBrandedWallpaperOptIn={toggleBrandedWallpaperOptIn}
+                      toggleBrandedWallpaperOptIn={false}
                       toggleShowBackgroundImage={this.toggleShowBackgroundImage}
-                      brandedWallpaperOptIn={brandedWallpaperOptIn}
+                      brandedWallpaperOptIn={false}
                       showBackgroundImage={showBackgroundImage}
                     />
                   ) : null
@@ -235,8 +235,8 @@ export default class Settings extends React.PureComponent<Props, State> {
                   activeTab === 2
                     ? (
                       <BraveRewardsSettings
-                        toggleShowRewards={toggleShowRewards}
-                        showRewards={showRewards}
+                        toggleShowRewards={false}
+                        showRewards={false}
                       />
                     ) : null
                 }
@@ -262,12 +262,12 @@ export default class Settings extends React.PureComponent<Props, State> {
                   activeTab === 5
                     ? (
                       <MoreCardsSettings
-                        toggleShowBinance={toggleShowBinance}
-                        showBinance={showBinance}
-                        binanceSupported={binanceSupported}
-                        toggleShowTogether={toggleShowTogether}
-                        showTogether={showTogether}
-                        togetherSupported={togetherSupported}
+                        toggleShowBinance={false}
+                        showBinance={false}
+                        binanceSupported={false}
+                        toggleShowTogether={false}
+                        showTogether={false}
+                        togetherSupported={false}
                       />
                     ) : null
                 }

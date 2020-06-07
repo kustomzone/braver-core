@@ -3343,11 +3343,11 @@ ledger::ClientInfoPtr GetDesktopClientInfo() {
 }
 
 ledger::ClientInfoPtr RewardsServiceImpl::GetClientInfo() {
-  #if defined(OS_ANDROID)
-    return android_util::GetAndroidClientInfo();
-  #else
+  // #if defined(OS_ANDROID)
+  //   return android_util::GetAndroidClientInfo();
+  // #else
     return GetDesktopClientInfo();
-  #endif
+  // #endif
 }
 
 void RewardsServiceImpl::UnblindedTokensReady() {

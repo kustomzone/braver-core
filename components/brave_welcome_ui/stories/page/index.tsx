@@ -128,7 +128,6 @@ export default class WelcomePage extends React.PureComponent<Props, State> {
               <ImportBox index={2} currentScreen={currentScreen} onClick={this.onClickImport} />
               <ShieldsBox index={3} currentScreen={currentScreen} />
               <SearchBox index={4} currentScreen={currentScreen} onClick={this.onClickConfirmDefaultSearchEngine} fakeOnChange={this.onChangeDefaultSearchEngine} isDefaultSearchGoogle={isDefaultSearchGoogle}/>
-              <RewardsBox index={5} currentScreen={currentScreen} onClick={this.onClickRewardsGetStarted} />
             </SlideContent>
             <FooterBox
               totalScreensSize={this.totalScreensSize}
