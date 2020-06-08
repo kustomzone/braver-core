@@ -461,21 +461,9 @@ class NewTabPage extends React.Component<Props, State> {
   }
 
   getCryptoContent () {
-    const { widgetStackOrder, binanceState, togetherSupported, showRewards } = this.props.newTabData
-    const lookup = {
-      'rewards': {
-        supported: showRewards,
-        render: this.renderRewardsWidget.bind(this)
-      },
-      'binance': {
-        supported: binanceState.binanceSupported,
-        render: this.renderBinanceWidget.bind(this)
-      },
-      'together': {
-        supported: togetherSupported,
-        render: this.renderTogetherWidget.bind(this)
-      }
-    }
+    const { widgetStackOrder } = this.props.newTabData
+    // Not on Braver's watch.
+    const lookup = {};
     const widgetList = widgetStackOrder.filter((widget: NewTab.StackWidget) => lookup[widget].supported)
 
     return (
