@@ -481,18 +481,8 @@ class NewTabPage extends React.Component<Props, State> {
   }
 
   renderCryptoContent () {
-    const { newTabData } = this.props
-    const { widgetStackOrder } = newTabData
-
-    if (!widgetStackOrder.length) {
-      return null
-    }
-
-    return (
-      <Page.GridItemWidgetStack>
-        {this.getCryptoContent()}
-      </Page.GridItemWidgetStack>
-    )
+    // Not on Braver's watch!
+    return null;
   }
 
   renderRewardsWidget (showContent: boolean) {
@@ -522,7 +512,6 @@ class NewTabPage extends React.Component<Props, State> {
     const hasImage = this.imageSource !== undefined
     const isShowingBrandedWallpaper = newTabData.brandedWallpaperData ? true : false
     const showTopSites = !!this.props.gridSitesData.gridSites.length && newTabData.showTopSites
-    const cryptoContent = this.renderCryptoContent()
 
     return (
       <Page.App dataIsReady={newTabData.initialDataLoaded}>
@@ -542,11 +531,11 @@ class NewTabPage extends React.Component<Props, State> {
         <Page.Page
             showClock={newTabData.showClock}
             showStats={newTabData.showStats}
-            showRewards={!!cryptoContent}
-            showTogether={newTabData.showTogether && newTabData.togetherSupported}
-            showBinance={newTabData.showBinance}
+            showRewards={false}
+            showTogether={false}
+            showBinance={false}
             showTopSites={showTopSites}
-            showBrandedWallpaper={isShowingBrandedWallpaper}
+            showBrandedWallpaper={false}
         >
           {newTabData.showStats &&
           <Page.GridItemStats>
@@ -592,7 +581,8 @@ class NewTabPage extends React.Component<Props, State> {
             </Page.GridItemNotification>
             ) : null
           }
-            {cryptoContent}
+          {/* Not on Braver's watch! */}
+          {/* {cryptoContent} */}
           <Page.Footer>
             <Page.FooterContent>
             {isShowingBrandedWallpaper && newTabData.brandedWallpaperData &&

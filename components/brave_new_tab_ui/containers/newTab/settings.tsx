@@ -64,12 +64,12 @@ export interface Props {
 }
 
 type ActiveTabType =
-  | "BackgroundImage"
+  // | "BackgroundImage"
   | "BraveStats"
-  | "Rewards"
+  // | "Rewards"
   | "TopSites"
   | "Clock"
-  | "moreCards";
+  // | "moreCards";
 
 interface State {
   activeTab: number;
