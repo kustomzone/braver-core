@@ -630,7 +630,7 @@ class NewTabPage extends React.Component<Props, State> {
     const { newTabData, gridSitesData, actions } = this.props
     const { showSettingsMenu } = this.state
     const { binanceState } = newTabData
-    const cryptoContent = this.renderCryptoContent()
+    // const cryptoContent = this.renderCryptoContent()
 
     if (!newTabData) {
       return null
