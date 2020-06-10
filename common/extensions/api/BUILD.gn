@@ -1,7 +1,7 @@
-import("//brave/components/binance/browser/buildflags/buildflags.gni")
+# import("//brave/components/binance/browser/buildflags/buildflags.gni")
 import("//brave/components/brave_sync/buildflags/buildflags.gni")
 import("//brave/components/brave_wallet/browser/buildflags/buildflags.gni")
-import("//brave/components/brave_together/buildflags/buildflags.gni")
+# import("//brave/components/brave_together/buildflags/buildflags.gni")
 import("//tools/grit/grit_rule.gni")
 import("//tools/json_schema_compiler/json_features.gni")
 import("//tools/json_schema_compiler/json_schema_api.gni")
@@ -18,13 +18,13 @@ json_features("api_features") {
     sources += [ "_brave_wallet_api_features.json" ]
   }
 
-  if (binance_enabled) {
-    sources += [ "_binance_api_features.json" ]
-  }
+  # if (binance_enabled) {
+  #   sources += [ "_binance_api_features.json" ]
+  # }
 
-  if (brave_together_enabled) {
-    sources += [ "_brave_together_api_features.json" ]
-  }
+  # if (brave_together_enabled) {
+  #   sources += [ "_brave_together_api_features.json" ]
+  # }
 }
 
 json_features("permission_features") {
@@ -57,26 +57,26 @@ json_features("behavior_features") {
 
 brave_extensions_api_schema_sources = [
   "brave_shields.json",
-  "brave_rewards.json",
+  # "brave_rewards.json",
   "brave_theme.json",
-  "rewards_notifications.json",
+  # "rewards_notifications.json",
 ]
 
 if (enable_brave_sync) {
   brave_extensions_api_schema_sources += [ "brave_sync.json" ]
 }
 
-if (brave_wallet_enabled) {
-  brave_extensions_api_schema_sources += [ "brave_wallet.json" ]
-}
+# if (brave_wallet_enabled) {
+#   brave_extensions_api_schema_sources += [ "brave_wallet.json" ]
+# }
 
-if (binance_enabled) {
-  brave_extensions_api_schema_sources += [ "binance.json" ]
-}
+# if (binance_enabled) {
+#   brave_extensions_api_schema_sources += [ "binance.json" ]
+# }
 
-if (brave_together_enabled) {
-  brave_extensions_api_schema_sources += [ "brave_together.json" ]
-}
+# if (brave_together_enabled) {
+#   brave_extensions_api_schema_sources += [ "brave_together.json" ]
+# }
 
 brave_extensions_api_uncompiled_sources = []
 brave_extensions_api_root_namespace = "extensions::api::%(namespace)s"
