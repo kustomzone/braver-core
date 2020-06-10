@@ -18,22 +18,23 @@ ledger::ClientInfoPtr GetAndroidClientInfo() {
 }
 
 std::string ParseClaimPromotionResponse(const std::string& response) {
-  base::Optional<base::Value> value = base::JSONReader::Read(response);
-  if (!value || !value->is_dict()) {
-    return "";
-  }
+  return "";
+  // base::Optional<base::Value> value = base::JSONReader::Read(response);
+  // if (!value || !value->is_dict()) {
+  //   return "";
+  // }
 
-  base::DictionaryValue* dictionary = nullptr;
-  if (!value->GetAsDictionary(&dictionary)) {
-    return "";
-  }
+  // base::DictionaryValue* dictionary = nullptr;
+  // if (!value->GetAsDictionary(&dictionary)) {
+  //   return "";
+  // }
 
-  auto* nonce = dictionary->FindKey("nonce");
-  if (!nonce || !nonce->is_string()) {
-    return "";
-  }
+  // auto* nonce = dictionary->FindKey("nonce");
+  // if (!nonce || !nonce->is_string()) {
+  //   return "";
+  // }
 
-  return nonce->GetString();
+  // return nonce->GetString();
 }
 
 }  // namespace android_util

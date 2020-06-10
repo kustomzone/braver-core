@@ -8,9 +8,10 @@
 
 #include <string>
 
-#include "bat/ledger/ledger_client.h"
+// #include "bat/ledger/ledger_client.h"
 
 namespace android_util {
+
 
 ledger::ClientInfoPtr GetAndroidClientInfo();
 
