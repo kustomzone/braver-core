@@ -461,9 +461,22 @@ class NewTabPage extends React.Component<Props, State> {
   }
 
   getCryptoContent () {
-    const { widgetStackOrder } = this.props.newTabData
-    // Not on Braver's watch.
-    const lookup = {};
+    return null;
+    const { widgetStackOrder, binanceState, togetherSupported, showRewards } = this.props.newTabData
+    const lookup = {
+      'rewards': {
+        supported: showRewards,
+        render: this.renderRewardsWidget.bind(this)
+      },
+      'binance': {
+        supported: binanceState.binanceSupported,
+        render: this.renderBinanceWidget.bind(this)
+      },
+      'together': {
+        supported: togetherSupported,
+        render: this.renderTogetherWidget.bind(this)
+      }
+    }
     const widgetList = widgetStackOrder.filter((widget: NewTab.StackWidget) => lookup[widget].supported)
 
     return (
@@ -483,27 +496,141 @@ class NewTabPage extends React.Component<Props, State> {
   renderCryptoContent () {
     // Not on Braver's watch!
     return null;
+    const { newTabData } = this.props
+    const { widgetStackOrder } = newTabData
+
+    if (!widgetStackOrder.length) {
+      return null
+    }
+
+    return (
+      <Page.GridItemWidgetStack>
+        {this.getCryptoContent()}
+      </Page.GridItemWidgetStack>
+    )
   }
 
   renderRewardsWidget (showContent: boolean) {
     // Not on Braver's watch!
     return null;
+    const { newTabData } = this.props
+    const {
+      rewardsState,
+      showRewards: rewardsWidgetOn,
+      textDirection
+    } = newTabData
+    const isShowingBrandedWallpaper = GetIsShowingBrandedWallpaper(this.props)
+    const shouldShowBrandedWallpaperNotification = GetShouldShowBrandedWallpaperNotification(this.props)
+    const shouldShowRewardsWidget = rewardsWidgetOn || shouldShowBrandedWallpaperNotification
+
+    if (!shouldShowRewardsWidget) {
+      return null
+    }
+
+    return (
+      <Rewards
+        {...rewardsState}
+        widgetTitle={getLocale('rewardsWidgetBraveRewards')}
+        onLearnMore={this.learnMoreRewards}
+        menuPosition={'left'}
+        isCrypto={true}
+        isCryptoTab={!showContent}
+        textDirection={textDirection}
+        preventFocus={false}
+        hideWidget={this.toggleShowRewards}
+        showContent={showContent}
+        onShowContent={this.setForegroundStackWidget.bind(this, 'rewards')}
+        onCreateWallet={this.createWallet}
+        onEnableAds={this.enableAds}
+        onEnableRewards={this.enableRewards}
+        isShowingBrandedWallpaper={isShowingBrandedWallpaper}
+        showBrandedWallpaperNotification={shouldShowBrandedWallpaperNotification}
+        onDisableBrandedWallpaper={this.disableBrandedWallpaper}
+        brandedWallpaperData={newTabData.brandedWallpaperData}
+        isNotification={!rewardsWidgetOn}
+        onDismissNotification={this.dismissNotification}
+        onDismissBrandedWallpaperNotification={this.dismissBrandedWallpaperNotification}
+      />
+    )
   }
 
   renderTogetherWidget (showContent: boolean) {
     // Not on Braver's watch!
     return null;
+    const { newTabData } = this.props
+    const { showTogether, textDirection, togetherSupported } = newTabData
+
+    if (!showTogether || !togetherSupported) {
+      return null
+    }
+
+    return (
+      <Together
+        isCrypto={true}
+        menuPosition={'left'}
+        widgetTitle={getLocale('togetherWidgetTitle')}
+        textDirection={textDirection}
+        hideWidget={this.toggleShowTogether}
+        showContent={showContent}
+        onShowContent={this.setForegroundStackWidget.bind(this, 'together')}
+      />
+    )
   }
 
   renderBinanceWidget (showContent: boolean) {
     // Not on Braver's watch!
     return null;
+    const { newTabData } = this.props
+    const { binanceState, showBinance, textDirection } = newTabData
+    const menuActions = { onLearnMore: this.learnMoreBinance }
+
+    if (!showBinance || !binanceState.binanceSupported) {
+      return null
+    }
+
+    if (binanceState.userAuthed) {
+      menuActions['onDisconnect'] = this.setDisconnectInProgress
+      menuActions['onRefreshData'] = this.updateActions
+    }
+
+    return (
+      <Binance
+        {...menuActions}
+        {...binanceState}
+        isCrypto={true}
+        isCryptoTab={!showContent}
+        menuPosition={'left'}
+        widgetTitle={'Binance'}
+        textDirection={textDirection}
+        preventFocus={false}
+        hideWidget={this.toggleShowBinance}
+        showContent={showContent}
+        onSetHideBalance={this.setHideBalance}
+        onBinanceClientUrl={this.onBinanceClientUrl}
+        onConnectBinance={this.connectBinance}
+        onDisconnectBinance={this.disconnectBinance}
+        onCancelDisconnect={this.cancelDisconnect}
+        onValidAuthCode={this.onValidAuthCode}
+        onBuyCrypto={this.buyCrypto}
+        onBinanceUserTLD={this.onBinanceUserTLD}
+        onShowContent={this.setForegroundStackWidget.bind(this, 'binance')}
+        onSetInitialAmount={this.setInitialAmount}
+        onSetInitialAsset={this.setInitialAsset}
+        onSetInitialFiat={this.setInitialFiat}
+        onSetUserTLDAutoSet={this.setUserTLDAutoSet}
+        onUpdateActions={this.updateActions}
+        onDismissAuthInvalid={this.dismissAuthInvalid}
+        onSetSelectedView={this.setSelectedView}
+        getCurrencyList={this.getCurrencyList}
+      />
+    )
   }
 
   render () {
     const { newTabData, gridSitesData, actions } = this.props
     const { showSettingsMenu } = this.state
     const { binanceState } = newTabData
+    const cryptoContent = this.renderCryptoContent()
 
     if (!newTabData) {
       return null
