@@ -96,10 +96,10 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
 #endif
 
   // appearance
-  registry->RegisterBooleanPref(kLocationBarIsWide, false);
+  registry->RegisterBooleanPref(kLocationBarIsWide, true);
   registry->RegisterBooleanPref(
       brave_rewards::prefs::kHideBraveRewardsButton,
-      false);
+      true);
 
   brave_sync::prefs::Prefs::RegisterProfilePrefs(registry);
 
