@@ -73,6 +73,13 @@ source_set("browser") {
     "//content/public/browser",
     "//content/public/common",
     "//services/network/public/mojom",
+    "//brave/components/resources",
+    "//brave/components/services/bat_ledger/public/cpp",
+  ]
+
+  
+  public_deps += [
+    "//brave/vendor/bat-native-ledger:headers",
   ]
 
   if (!is_android) {
@@ -97,8 +104,6 @@ source_set("browser") {
 
     deps += [
       "//brave/components/brave_ads/browser/buildflags",
-      "//brave/components/resources",
-      "//brave/components/services/bat_ledger/public/cpp",
       "//mojo/public/cpp/bindings",
       "//net",
       "//services/network/public/cpp",
@@ -106,9 +111,6 @@ source_set("browser") {
       "//url",
     ]
 
-    public_deps += [
-      "//brave/vendor/bat-native-ledger:headers",
-    ]
 
     if (is_android) {
       deps += [ "android" ]
