@@ -38,7 +38,7 @@ namespace extensions {
     switch (manifest_resource_id) {
       // Please keep the list in alphabetical order.
       case IDR_BRAVE_EXTENSION:
-      case IDR_BRAVE_REWARDS:
+      // case IDR_BRAVE_REWARDS:
       case IDR_BRAVE_SYNC_EXTENSION:
       case IDR_BRAVE_WEBTORRENT:
         return true;
