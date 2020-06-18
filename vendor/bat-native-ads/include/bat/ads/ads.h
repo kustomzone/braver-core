@@ -42,9 +42,6 @@ extern const char _bundle_schema_resource_name[];
 // Catalog schema resource name
 extern const char _catalog_schema_resource_name[];
 
-// Sample bundle resource name
-extern const char _sample_bundle_resource_name[];
-
 // Catalog resource name
 extern const char _catalog_resource_name[];
 
@@ -104,6 +101,9 @@ class ADS_EXPORT Ads {
   //     <language>-<REGION>.<ENCODING> i.e. en_US.UTF-8
   virtual void ChangeLocale(
       const std::string& locale) = 0;
+
+  // Should be called when the ads subdivision targeting code has changed
+  virtual void OnAdsSubdivisionTargetingCodeHasChanged() = 0;
 
   // Should be called when a page has loaded in a browser tab, and the HTML is
   // available for analysis

@@ -359,12 +359,6 @@ void Database::GetAllPromotions(ledger::GetAllPromotionsCallback callback) {
   promotion_->GetAllRecords(callback);
 }
 
-void Database::DeletePromotionList(
-    const std::vector<std::string>& ids,
-    ledger::ResultCallback callback) {
-  promotion_->DeleteRecordList(ids, callback);
-}
-
 void Database::SavePromotionClaimId(
     const std::string& promotion_id,
     const std::string& claim_id,
@@ -555,7 +549,7 @@ void Database::SaveUnblindedTokenList(
   unblinded_token_->InsertOrUpdateList(std::move(list), callback);
 }
 
-void Database::MarkUblindedTokensAsSpent(
+void Database::MarkUnblindedTokensAsSpent(
     const std::vector<std::string>& ids,
     ledger::RewardsType redeem_type,
     const std::string& redeem_id,
@@ -567,10 +561,34 @@ void Database::MarkUblindedTokensAsSpent(
       callback);
 }
 
+void Database::MarkUnblindedTokensAsReserved(
+    const std::vector<std::string>& ids,
+    const std::string& redeem_id,
+    ledger::ResultCallback callback) {
+  unblinded_token_->MarkRecordListAsReserved(
+      ids,
+      redeem_id,
+      callback);
+}
+
+void Database::MarkUnblindedTokensAsSpendable(
+    const std::string& redeem_id,
+    ledger::ResultCallback callback) {
+  unblinded_token_->MarkRecordListAsSpendable(
+      redeem_id,
+      callback);
+}
+
 void Database::GetSpendableUnblindedTokensByTriggerIds(
     const std::vector<std::string>& trigger_ids,
     ledger::GetUnblindedTokenListCallback callback) {
   unblinded_token_->GetSpendableRecordsByTriggerIds(trigger_ids, callback);
+}
+
+void Database::GetReservedUnblindedTokens(
+    const std::string& redeem_id,
+    ledger::GetUnblindedTokenListCallback callback) {
+  unblinded_token_->GetReservedRecordList(redeem_id, callback);
 }
 
 void Database::GetSpendableUnblindedTokensByBatchTypes(

@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 
+#include "base/strings/string_util.h"
 #include "brave/browser/net/url_context.h"
 #include "brave/browser/translate/buildflags/buildflags.h"
 #include "brave/common/network_constants.h"
@@ -179,11 +180,12 @@ TEST(BraveStaticRedirectNetworkDelegateHelperTest, ModifyCRXDownload_http) {
 }
 
 TEST(BraveStaticRedirectNetworkDelegateHelperTest, ModifySafeBrowsingURLV4) {
+  brave::SetSafeBrowsingEndpointForTesting(true);
   const GURL url(
       "https://safebrowsing.googleapis.com/v4/"
       "threatListUpdates:fetch?$req=ChkKCGNocm9taXVtEg02Ni");
   GURL::Replacements replacements;
-  replacements.SetHostStr(SAFEBROWSING_ENDPOINT);
+  replacements.SetHostStr(brave::kSafeBrowsingTestingEndpoint);
   const GURL expected_url(url.ReplaceComponents(replacements));
 
   auto request_info = std::make_shared<brave::BraveRequestInfo>(url);
@@ -194,11 +196,12 @@ TEST(BraveStaticRedirectNetworkDelegateHelperTest, ModifySafeBrowsingURLV4) {
 }
 
 TEST(BraveStaticRedirectNetworkDelegateHelperTest, ModifySafeBrowsingURLV5) {
+  brave::SetSafeBrowsingEndpointForTesting(true);
   const GURL url(
       "https://safebrowsing.googleapis.com/v5/"
       "threatListUpdates:fetch?$req=ChkKCGNocm9taXVtEg02Ni");
   GURL::Replacements replacements;
-  replacements.SetHostStr(SAFEBROWSING_ENDPOINT);
+  replacements.SetHostStr(brave::kSafeBrowsingTestingEndpoint);
   GURL expected_url(url.ReplaceComponents(replacements));
 
   auto request_info = std::make_shared<brave::BraveRequestInfo>(url);
@@ -235,6 +238,33 @@ TEST(BraveStaticRedirectNetworkDelegateHelperTest, ModifyGoogleDl) {
   int rc =
       OnBeforeURLRequest_StaticRedirectWork(ResponseCallback(), request_info);
   EXPECT_EQ(request_info->new_url_spec, expected_url);
+  EXPECT_EQ(rc, net::OK);
+}
+
+TEST(BraveStaticRedirectNetworkDelegateHelperTest, DontModifyGvt1ForWidevine) {
+  const GURL url(
+      "http://r2---sn-n4v7sn7y.gvt1.com/edgedl/chromewebstore/"
+      "L2Nocm9tZV9leHRlbnNpb24vYmxvYnMvYjYxQUFXaFBmeUtPbVFUYUh"
+      "mRGV0MS1Wdw/4.10.1610.0_oimompecagnajdejgnnjijobebaeigek"
+      ".crx");
+  auto request_info = std::make_shared<brave::BraveRequestInfo>(url);
+  int rc =
+      OnBeforeURLRequest_StaticRedirectWork(ResponseCallback(), request_info);
+  EXPECT_EQ(request_info->new_url_spec, "");
+  EXPECT_EQ(rc, net::OK);
+}
+
+TEST(BraveStaticRedirectNetworkDelegateHelperTest,
+     DontModifyGoogleDlForWidevine) {
+  const GURL url(
+      "http://dl.google.com/edgedl/chromewebstore/"
+      "L2Nocm9tZV9leHRlbnNpb24vYmxvYnMvYjYxQUFXaFBmeUtPbVFUYUh"
+      "mRGV0MS1Wdw/4.10.1610.0_oimompecagnajdejgnnjijobebaeigek"
+      ".crx");
+  auto request_info = std::make_shared<brave::BraveRequestInfo>(url);
+  int rc =
+      OnBeforeURLRequest_StaticRedirectWork(ResponseCallback(), request_info);
+  EXPECT_EQ(request_info->new_url_spec, "");
   EXPECT_EQ(rc, net::OK);
 }
 

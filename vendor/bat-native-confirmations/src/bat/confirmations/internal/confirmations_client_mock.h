@@ -6,13 +6,12 @@
 #ifndef BAT_CONFIRMATIONS_INTERNAL_CONFIRMATIONS_CLIENT_MOCK_H_
 #define BAT_CONFIRMATIONS_INTERNAL_CONFIRMATIONS_CLIENT_MOCK_H_
 
+#include "bat/confirmations/confirmations_client.h"
+
 #include <stdint.h>
+
 #include <string>
 #include <vector>
-#include <memory>
-
-#include "bat/confirmations/confirmations_client.h"
-#include "bat/confirmations/confirmations.h"
 
 #include "testing/gmock/include/gmock/gmock.h"
 
@@ -23,16 +22,17 @@ class ConfirmationsClientMock : public ConfirmationsClient {
   ConfirmationsClientMock();
   ~ConfirmationsClientMock() override;
 
+  ConfirmationsClientMock(const ConfirmationsClientMock&) = delete;
+  ConfirmationsClientMock& operator=(const ConfirmationsClientMock&) = delete;
+
   MOCK_METHOD1(OnWalletInitialized, void(
       ledger::Result result));
 
   MOCK_METHOD0(GetRewardsParameters, void());
 
-  MOCK_METHOD4(OnReconcileComplete, void(
-      Result result,
-      const std::string& contribution_id,
-      const double amount,
-      const ledger::RewardsType type));
+  MOCK_METHOD2(OnReconcileComplete, void(
+      const ledger::Result result,
+      ledger::ContributionInfoPtr contribution));
 
   MOCK_METHOD1(LoadLedgerState, void(
       ledger::OnLoadCallback callback));

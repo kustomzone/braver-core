@@ -87,7 +87,7 @@ class BundleStateDatabase {
   bool CreateCreativeAdNotificationCategoriesCategoryIndex();
 
   bool CreateAdConversionsTable();
-  bool TruncateAdConversionsTable();
+  bool PurgeExpiredAdConversions();
   bool InsertOrUpdateAdConversion(
       const ads::AdConversionInfo& info);
 
@@ -103,6 +103,8 @@ class BundleStateDatabase {
   bool MigrateV3toV4();
   bool MigrateV4toV5();
   bool MigrateV5toV6();
+  bool MigrateV6toV7();
+  bool MigrateV7toV8();
 
   sql::Database db_;
   sql::MetaTable meta_table_;

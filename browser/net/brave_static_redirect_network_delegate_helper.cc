@@ -5,15 +5,36 @@
 
 #include "brave/browser/net/brave_static_redirect_network_delegate_helper.h"
 
+#include <algorithm>
 #include <memory>
+#include <string>
 #include <vector>
 
+#include "base/strings/string_piece_forward.h"
 #include "brave/browser/translate/buildflags/buildflags.h"
 #include "brave/common/network_constants.h"
 #include "brave/common/translate_network_constants.h"
 #include "extensions/common/url_pattern.h"
 
 namespace brave {
+
+const char kSafeBrowsingTestingEndpoint[] = "test.safebrowsing.com";
+
+namespace {
+
+bool g_safebrowsing_api_endpoint_for_testing_ = false;
+
+base::StringPiece GetSafeBrowsingEndpoint() {
+  if (g_safebrowsing_api_endpoint_for_testing_)
+    return kSafeBrowsingTestingEndpoint;
+  return SAFEBROWSING_ENDPOINT;
+}
+
+}  // namespace
+
+void SetSafeBrowsingEndpointForTesting(bool testing) {
+  g_safebrowsing_api_endpoint_for_testing_ = testing;
+}
 
 int OnBeforeURLRequest_StaticRedirectWork(
     const ResponseCallback& next_callback,
@@ -36,6 +57,9 @@ int OnBeforeURLRequest_StaticRedirectWorkForGURL(
                                          kSafeBrowsingPrefix);
   static URLPattern safebrowsingfilecheck_pattern(URLPattern::SCHEME_HTTPS,
                                          kSafeBrowsingFileCheckPrefix);
+
+  // To-Do (@jumde) - Update the naming for the variables below
+  // https://github.com/brave/brave-browser/issues/10314
   static URLPattern crlSet_pattern1(
       URLPattern::SCHEME_HTTP | URLPattern::SCHEME_HTTPS, kCRLSetPrefix1);
   static URLPattern crlSet_pattern2(
@@ -54,6 +78,13 @@ int OnBeforeURLRequest_StaticRedirectWorkForGURL(
       URLPattern::SCHEME_HTTP | URLPattern::SCHEME_HTTPS,
       "*://dl.google.com/*");
 
+  static URLPattern widevine_gvt1_pattern(
+      URLPattern::SCHEME_HTTP | URLPattern::SCHEME_HTTPS,
+      kWidevineGvt1Prefix);
+  static URLPattern widevine_google_dl_pattern(
+      URLPattern::SCHEME_HTTP | URLPattern::SCHEME_HTTPS,
+      kWidevineGoogleDlPrefix);
+
 #if BUILDFLAG(ENABLE_BRAVE_TRANSLATE_GO)
   static URLPattern translate_pattern(URLPattern::SCHEME_HTTPS,
       kTranslateElementJSPattern);
@@ -65,8 +96,10 @@ int OnBeforeURLRequest_StaticRedirectWorkForGURL(
     return net::OK;
   }
 
-  if (safeBrowsing_pattern.MatchesHost(request_url)) {
-    replacements.SetHostStr(SAFEBROWSING_ENDPOINT);
+  auto safebrowsing_endpoint = GetSafeBrowsingEndpoint();
+  if (!safebrowsing_endpoint.empty() &&
+      safeBrowsing_pattern.MatchesHost(request_url)) {
+    replacements.SetHostStr(safebrowsing_endpoint);
     *new_url = request_url.ReplaceComponents(replacements);
     return net::OK;
   }
@@ -123,14 +156,16 @@ int OnBeforeURLRequest_StaticRedirectWorkForGURL(
     return net::OK;
   }
 
-  if (gvt1_pattern.MatchesURL(request_url)) {
+  if (gvt1_pattern.MatchesURL(request_url) &&
+      !widevine_gvt1_pattern.MatchesURL(request_url)) {
     replacements.SetSchemeStr("https");
     replacements.SetHostStr(kBraveRedirectorProxy);
     *new_url = request_url.ReplaceComponents(replacements);
     return net::OK;
   }
 
-  if (googleDl_pattern.MatchesURL(request_url)) {
+  if (googleDl_pattern.MatchesURL(request_url) &&
+      !widevine_google_dl_pattern.MatchesURL(request_url)) {
     replacements.SetSchemeStr("https");
     replacements.SetHostStr(kBraveRedirectorProxy);
     *new_url = request_url.ReplaceComponents(replacements);
