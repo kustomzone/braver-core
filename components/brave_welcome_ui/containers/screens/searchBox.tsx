@@ -31,8 +31,8 @@ export default class SearchEngineBox extends React.PureComponent<Props, State> {
   constructor (props: Props) {
     super(props)
     this.state = {
-      searchEngineSelected: false,
-      isDefaultSearchGoogle: true
+      searchEngineSelected: true,
+      isDefaultSearchGoogle: false
     }
   }
 

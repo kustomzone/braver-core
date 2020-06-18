@@ -52,6 +52,7 @@ export function wireApiEventsToStore () {
 }
 
 export function rewardsInitData () {
+  return;
   getRewardsPreInitialData()
   .then((preInitialRewardsData) => {
     getActions().setPreInitialRewardsData(preInitialRewardsData)
@@ -68,6 +69,7 @@ export function rewardsInitData () {
 }
 
 function binanceInitData () {
+  return;
   getBinanceBlackList()
   .then(({ isSupportedRegion, onlyAnonWallet }) => {
     if (onlyAnonWallet || !isSupportedRegion) {
@@ -82,6 +84,7 @@ function binanceInitData () {
 }
 
 function setRewardsFetchInterval () {
+  return;
   window.setInterval(() => {
     chrome.braveRewards.getWalletExists((exists: boolean) => {
       if (exists) {
@@ -105,6 +108,7 @@ chrome.braveRewards.onWalletInitialized.addListener((result: any | NewTab.Reward
   getActions().onWalletInitialized(result)
 })
 
+/*
 chrome.braveRewards.onEnabledMain.addListener((enabledMain: boolean) => {
   chrome.braveRewards.getAdsEnabled((enabledAds: boolean) => {
     getActions().onEnabledMain(enabledMain, enabledAds)
@@ -122,3 +126,4 @@ chrome.braveRewards.onPromotions.addListener((result: number, promotions: NewTab
 chrome.braveRewards.onPromotionFinish.addListener((result: number, promotion: NewTab.Promotion) => {
   getActions().onPromotionFinish(result, promotion)
 })
+*/

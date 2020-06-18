@@ -209,7 +209,7 @@ BravePatching.RegisterPolymerTemplateModifications({
     appearanceBrowserEl.insertAdjacentElement('afterend', newTabEl)
     // Add Sync and Help Tips item
     const helpTipsEl = createMenuElement(loadTimeData.getString('braveHelpTips'), '/braveHelpTips', 'brave_settings:help')
-    if (loadTimeData.getBoolean('isSyncDisabled')) {
+    if (true) {
       newTabEl.insertAdjacentElement('afterend', helpTipsEl)
     } else {
       const syncEl = createMenuElement(loadTimeData.getString('braveSync'), '/braveSync', 'brave_settings:sync')
@@ -281,7 +281,7 @@ BravePatching.RegisterPolymerTemplateModifications({
     r.SHIELDS = r.BASIC.createSection('/shields', 'shields')
     r.SOCIAL_BLOCKING = r.BASIC.createSection('/socialBlocking', 'socialBlocking')
     r.EXTENSIONS = r.BASIC.createSection('/extensions', 'extensions')
-    r.BRAVE_SYNC = r.BASIC.createSection('/braveSync', 'braveSync')
+    // r.BRAVE_SYNC = r.BASIC.createSection('/braveSync', 'braveSync')
     r.BRAVE_SYNC_SETUP = r.BRAVE_SYNC.createChild('/braveSync/setup');
     r.BRAVE_HELP_TIPS = r.BASIC.createSection('/braveHelpTips', 'braveHelpTips')
     r.BRAVE_NEW_TAB = r.BASIC.createSection('/newTab', 'newTab')
@@ -387,7 +387,7 @@ BravePatching.RegisterPolymerTemplateModifications({
       // Insert New Tab
       sectionAppearance.insertAdjacentElement('afterend', sectionNewTab)
       // Insert sync
-      sectionNewTab.insertAdjacentElement('afterend', sectionSync)
+      // sectionNewTab.insertAdjacentElement('afterend', sectionSync)
       // Insert shields
       sectionSync.insertAdjacentElement('afterend', sectionShields)
       // Insert Social Blocking

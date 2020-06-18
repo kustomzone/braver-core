@@ -31,13 +31,13 @@ export const StyledWidgetMenuContainer = styled<WidgetVisibilityProps & WidgetPo
   right: 5px;
 
   ${StyledWidgetContainer}:hover & {
-    visibility: visible;
+    visibility: hidden;
     pointer-events: auto;
   }
 
   // Also hover when menu button has been clicked
   ${ p => p.widgetMenuPersist && `
-    visibility: visible;
+    visibility: hidden;
     pointer-events: auto;
   `}
 `
@@ -58,12 +58,12 @@ export const StyledWidget = styled<WidgetVisibilityProps, 'div'>('div')`
   border-radius: ${p => p.isCrypto ? 'initial' : '16px'};
 
   ${StyledWidgetMenuContainer}:hover & {
-    background: rgba(33, 37, 41, 0.48);
+    background: rgba(33, 37, 41, 0.0);
   }
 
   // Also hover when menu button has been clicked
   ${ p => (p.widgetMenuPersist && !p.isCryptoTab) && `
-    background: rgba(33, 37, 41, 0.48);
+    background: rgba(33, 37, 41, 0.0);
   `}
 
   &:hover {

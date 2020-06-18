@@ -40,6 +40,7 @@ BraveGCMChannelStatus* BraveGCMChannelStatus::GetForProfile(
 }
 
 bool BraveGCMChannelStatus::IsGCMEnabled() const {
+  return false;
   return gcm_enabled_;
 }
 

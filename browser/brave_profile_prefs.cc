@@ -99,7 +99,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(kLocationBarIsWide, false);
   registry->RegisterBooleanPref(
       brave_rewards::prefs::kHideBraveRewardsButton,
-      false);
+      true);
 
   brave_sync::Prefs::RegisterProfilePrefs(registry);
 
@@ -147,7 +147,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
 #endif
 
   // Hangouts
-  registry->RegisterBooleanPref(kHangoutsEnabled, true);
+  registry->RegisterBooleanPref(kHangoutsEnabled, false);
 
   // Media Router
   registry->SetDefaultPrefValue(prefs::kEnableMediaRouter, base::Value(false));
@@ -204,9 +204,9 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(kNewTabPageShowClock, true);
   registry->RegisterBooleanPref(kNewTabPageShowTopSites, true);
   registry->RegisterBooleanPref(kNewTabPageShowStats, true);
-  registry->RegisterBooleanPref(kNewTabPageShowRewards, true);
-  registry->RegisterBooleanPref(kNewTabPageShowBinance, true);
-  registry->RegisterBooleanPref(kNewTabPageShowTogether, true);
+  registry->RegisterBooleanPref(kNewTabPageShowRewards, false);
+  registry->RegisterBooleanPref(kNewTabPageShowBinance, false);
+  registry->RegisterBooleanPref(kNewTabPageShowTogether, false);
 
   // Brave Wallet
   registry->RegisterIntegerPref(kBraveWalletPrefVersion, 0);

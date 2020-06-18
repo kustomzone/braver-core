@@ -648,11 +648,11 @@ class NewTabPage extends React.Component<Props, State> {
         <Page.Page
             showClock={newTabData.showClock}
             showStats={newTabData.showStats}
-            showRewards={!!cryptoContent}
-            showTogether={newTabData.showTogether && newTabData.togetherSupported}
-            showBinance={newTabData.showBinance}
+            showRewards={false}
+            showTogether={false}
+            showBinance={false}
             showTopSites={showTopSites}
-            showBrandedWallpaper={isShowingBrandedWallpaper}
+            showBrandedWallpaper={false}
         >
           {newTabData.showStats &&
           <Page.GridItemStats>

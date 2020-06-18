@@ -121,14 +121,14 @@ void BravePrivacyHandler::SetP3AEnabled(const base::ListValue* args) {
   args->GetBoolean(0, &enabled);
 
   PrefService* local_state = g_browser_process->local_state();
-  local_state->SetBoolean(brave::kP3AEnabled, enabled);
+  local_state->SetBoolean(brave::kP3AEnabled, false);
 }
 
 void BravePrivacyHandler::GetP3AEnabled(const base::ListValue* args) {
   CHECK_EQ(args->GetSize(), 1U);
 
-  PrefService* local_state = g_browser_process->local_state();
-  bool enabled = local_state->GetBoolean(brave::kP3AEnabled);
+  // PrefService* local_state = g_browser_process->local_state();
+  bool enabled = false; // local_state->GetBoolean(brave::kP3AEnabled);
 
   AllowJavascript();
   ResolveJavascriptCallback(args->GetList()[0].Clone(), base::Value(enabled));
