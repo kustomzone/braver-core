@@ -66,13 +66,13 @@ class GreaselionService;
 #endif
 
 class Profile;
-class BraveRewardsBrowserTest;
+class RewardsBrowserTest;
 
 namespace brave_rewards {
 
 class RewardsDatabase;
 class RewardsNotificationServiceImpl;
-class BraveRewardsBrowserTest;
+class RewardsBrowserTest;
 
 using GetEnvironmentCallback = base::Callback<void(ledger::Environment)>;
 using GetDebugCallback = base::Callback<void(bool)>;
@@ -327,7 +327,7 @@ class RewardsServiceImpl : public RewardsService,
   void ForTestingSetTestResponseCallback(GetTestResponseCallback callback);
 
  private:
-  friend class ::BraveRewardsBrowserTest;
+  friend class ::RewardsBrowserTest;
 
   const base::OneShotEvent& ready() const { return ready_; }
 
@@ -475,9 +475,7 @@ class RewardsServiceImpl : public RewardsService,
       double balance);
   void OnReconcileComplete(
       const ledger::Result result,
-      const std::string& contribution_id,
-      const double amount,
-      const ledger::RewardsType type) override;
+      ledger::ContributionInfoPtr contribution) override;
   void OnAttestPromotion(
       AttestPromotionCallback callback,
       const ledger::Result result,

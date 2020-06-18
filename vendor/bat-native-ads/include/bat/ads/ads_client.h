@@ -21,6 +21,7 @@
 #include "bat/ads/export.h"
 #include "bat/ads/ad_notification_info.h"
 #include "bat/ads/result.h"
+#include "bat/ads/log_stream.h"
 
 namespace ads {
 
@@ -59,6 +60,29 @@ class ADS_EXPORT AdsClient {
 
   // Should return the maximum number of ads that can be shown per day
   virtual uint64_t GetAdsPerDay() const = 0;
+
+  // Should return |true| if ads subdivision targeting is allowed; otherwise,
+  // should return |false|
+  virtual bool ShouldAllowAdsSubdivisionTargeting() const = 0;
+
+  // Set if ads subdivision targeting is allowed
+  virtual void SetAllowAdsSubdivisionTargeting(
+      const bool should_allow) = 0;
+
+  // Should return the ads subdivision targeting code
+  virtual std::string GetAdsSubdivisionTargetingCode() const = 0;
+
+  // Set the ads subdivision targeting code
+  virtual void SetAdsSubdivisionTargetingCode(
+      const std::string& subdivision_targeting_code) = 0;
+
+  // Should return the automatically detected ads subdivision targeting code
+  virtual std::string
+      GetAutomaticallyDetectedAdsSubdivisionTargetingCode() const = 0;
+
+  // Set the automatically detected ads subdivision targeting code
+  virtual void SetAutomaticallyDetectedAdsSubdivisionTargetingCode(
+      const std::string& subdivision_targeting_code) = 0;
 
   // Set the idle threshold specified in seconds for how long a user should be
   // idle before |OnUnIdle| is called. This call is optional for mobile devices

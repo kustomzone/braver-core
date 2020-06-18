@@ -245,10 +245,6 @@ class Database {
 
   void GetAllPromotions(ledger::GetAllPromotionsCallback callback);
 
-  void DeletePromotionList(
-      const std::vector<std::string>& ids,
-      ledger::ResultCallback callback);
-
   void SavePromotionClaimId(
       const std::string& promotion_id,
       const std::string& claim_id,
@@ -375,14 +371,27 @@ class Database {
       ledger::UnblindedTokenList list,
       ledger::ResultCallback callback);
 
-  void MarkUblindedTokensAsSpent(
+  void MarkUnblindedTokensAsSpent(
       const std::vector<std::string>& ids,
       ledger::RewardsType redeem_type,
       const std::string& redeem_id,
       ledger::ResultCallback callback);
 
+  void MarkUnblindedTokensAsReserved(
+      const std::vector<std::string>& ids,
+      const std::string& redeem_id,
+      ledger::ResultCallback callback);
+
+  void MarkUnblindedTokensAsSpendable(
+      const std::string& redeem_id,
+      ledger::ResultCallback callback);
+
   void GetSpendableUnblindedTokensByTriggerIds(
       const std::vector<std::string>& trigger_ids,
+      ledger::GetUnblindedTokenListCallback callback);
+
+  void GetReservedUnblindedTokens(
+      const std::string& redeem_id,
       ledger::GetUnblindedTokenListCallback callback);
 
   void GetSpendableUnblindedTokensByBatchTypes(

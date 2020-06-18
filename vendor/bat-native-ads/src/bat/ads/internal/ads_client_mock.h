@@ -18,10 +18,10 @@
 
 namespace ads {
 
-class MockAdsClient : public AdsClient {
+class AdsClientMock : public AdsClient {
  public:
-  MockAdsClient();
-  ~MockAdsClient() override;
+  AdsClientMock();
+  ~AdsClientMock() override;
 
   MOCK_CONST_METHOD0(IsEnabled, bool());
 
@@ -32,6 +32,22 @@ class MockAdsClient : public AdsClient {
   MOCK_CONST_METHOD0(GetAdsPerHour, uint64_t());
 
   MOCK_CONST_METHOD0(GetAdsPerDay, uint64_t());
+
+  MOCK_CONST_METHOD0(ShouldAllowAdsSubdivisionTargeting, bool());
+
+  MOCK_METHOD1(SetAllowAdsSubdivisionTargeting, void(
+      const bool should_allow));
+
+  MOCK_CONST_METHOD0(GetAdsSubdivisionTargetingCode, std::string());
+
+  MOCK_METHOD1(SetAdsSubdivisionTargetingCode, void(
+      const std::string& subdivision_targeting_code));
+
+  MOCK_CONST_METHOD0(GetAutomaticallyDetectedAdsSubdivisionTargetingCode,
+      std::string());
+
+  MOCK_METHOD1(SetAutomaticallyDetectedAdsSubdivisionTargetingCode, void(
+      const std::string& subdivision_targeting_code));
 
   MOCK_METHOD1(SetIdleThreshold, void(
       const int threshold));
@@ -49,10 +65,12 @@ class MockAdsClient : public AdsClient {
 
   MOCK_CONST_METHOD0(IsForeground, bool());
 
-  MOCK_METHOD0(ShouldShowNotifications, bool());
+  MOCK_CONST_METHOD0(CanShowBackgroundNotifications, bool());
 
   MOCK_METHOD1(ShowNotification, void(
       std::unique_ptr<AdNotificationInfo> info));
+
+  MOCK_METHOD0(ShouldShowNotifications, bool());
 
   MOCK_METHOD1(CloseNotification, void(
       const std::string& uuid));
@@ -109,8 +127,6 @@ class MockAdsClient : public AdsClient {
       const int line,
       const int verbose_level,
       const std::string& message));
-
-  MOCK_CONST_METHOD0(CanShowBackgroundNotifications, bool());
 };
 
 }  // namespace ads

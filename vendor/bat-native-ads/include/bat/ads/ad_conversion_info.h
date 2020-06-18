@@ -6,6 +6,8 @@
 #ifndef BAT_ADS_AD_CONVERSION_INFO_H_
 #define BAT_ADS_AD_CONVERSION_INFO_H_
 
+#include <stdint.h>
+
 #include <string>
 #include <vector>
 
@@ -22,7 +24,6 @@ struct ADS_EXPORT AdConversionInfo {
 
   bool operator==(
       const AdConversionInfo& rhs) const;
-
   bool operator!=(
       const AdConversionInfo& rhs) const;
 
@@ -41,6 +42,7 @@ struct ADS_EXPORT AdConversionInfo {
   std::string type;
   std::string url_pattern;
   unsigned int observation_window = 0;
+  uint64_t expiry_timestamp = 0;
 };
 
 using AdConversionList = std::vector<AdConversionInfo>;
