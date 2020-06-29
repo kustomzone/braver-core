@@ -57,7 +57,7 @@ window.cr.define('brave_rewards', function () {
     getActions().onWalletCreateFailed()
   }
 
-  function parameters (properties: Rewards.RewardsParameters) {
+  function rewardsParameters (properties: Rewards.RewardsParameters) {
     getActions().onRewardsParameters(properties)
   }
 
@@ -178,11 +178,15 @@ window.cr.define('brave_rewards', function () {
     getActions().getBalance()
   }
 
+  function initialized (result: number) {
+    getActions().onInitialized(result)
+  }
+
   return {
     initialize,
     walletCreated,
     walletCreateFailed,
-    parameters,
+    rewardsParameters,
     promotions,
     walletPassphrase,
     promotionFinish,
@@ -208,7 +212,8 @@ window.cr.define('brave_rewards', function () {
     balance,
     reconcileComplete,
     onlyAnonWallet,
-    unblindedTokensReady
+    unblindedTokensReady,
+    initialized
   }
 })
 

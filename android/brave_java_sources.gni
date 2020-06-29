@@ -5,8 +5,9 @@
 
 import("//brave/browser/brave_ads/android/java_sources.gni")
 import("//brave/components/brave_ads/browser/buildflags/buildflags.gni")
-import("//brave/components/brave_rewards/browser/android/java_sources.gni")
+import("//brave/components/brave_referrals/buildflags/buildflags.gni")
 import("//brave/components/brave_rewards/browser/buildflags/buildflags.gni")
+import("//brave/components/safetynet/java_sources.gni")
 
 brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/BraveActivity.java",
@@ -30,9 +31,6 @@ brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/BraveRewardsUserWalletActivity.java",
   "../../brave/android/java/org/chromium/chrome/browser/BraveRewardsVerifyWalletActivity.java",
   "../../brave/android/java/org/chromium/chrome/browser/appmenu/BraveTabbedAppMenuPropertiesDelegate.java",
-  "../../brave/android/java/org/chromium/chrome/browser/bookmarks/BraveBookmarkModel.java",
-  "../../brave/android/java/org/chromium/chrome/browser/bookmarks/BraveBookmarkUtils.java",
-  "../../brave/android/java/org/chromium/chrome/browser/bookmarks/BraveBookmarkWorker.java",
   "../../brave/android/java/org/chromium/chrome/browser/document/BraveLauncherActivity.java",
   "../../brave/android/java/org/chromium/chrome/browser/externalnav/BraveExternalNavigationHandler.java",
   "../../brave/android/java/org/chromium/chrome/browser/help/BraveHelpAndFeedback.java",
@@ -80,7 +78,6 @@ brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/partnercustomizations/CloseBraveManager.java",
   "../../brave/android/java/org/chromium/chrome/browser/preferences/BravePreferenceKeys.java",
   "../../brave/android/java/org/chromium/chrome/browser/preferences/BravePrefServiceBridge.java",
-  "../../brave/android/java/org/chromium/chrome/browser/preferences/BraveSyncScreensObserver.java",
   "../../brave/android/java/org/chromium/chrome/browser/preferences/website/BraveShieldsContentSettings.java",
   "../../brave/android/java/org/chromium/chrome/browser/preferences/website/BraveShieldsContentSettingsObserver.java",
   "../../brave/android/java/org/chromium/chrome/browser/privacy/settings/BravePrivacySettings.java",
@@ -113,8 +110,8 @@ brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/site_settings/BraveSiteSettingsPreferencesBase.java",
   "../../brave/android/java/org/chromium/chrome/browser/site_settings/DesktopModePreferences.java",
   "../../brave/android/java/org/chromium/chrome/browser/site_settings/PlayYTVideoInBrowserPreferences.java",
-  "../../brave/android/java/org/chromium/chrome/browser/sync/BraveSyncService.java",
-  "../../brave/android/java/org/chromium/chrome/browser/sync/BraveSyncServiceObserver.java",
+  "../../brave/android/java/org/chromium/chrome/browser/sync/BraveSyncDevices.java",
+  "../../brave/android/java/org/chromium/chrome/browser/sync/settings/BraveManageSyncSettings.java",
   "../../brave/android/java/org/chromium/chrome/browser/toolbar/BraveHomeButton.java",
   "../../brave/android/java/org/chromium/chrome/browser/toolbar/bottom/BookmarksButton.java",
   "../../brave/android/java/org/chromium/chrome/browser/toolbar/bottom/BraveBottomToolbarConfiguration.java",
@@ -123,8 +120,10 @@ brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/toolbar/bottom/BraveBrowsingModeBottomToolbarCoordinator.java",
   "../../brave/android/java/org/chromium/chrome/browser/toolbar/bottom/BraveSearchAccelerator.java",
   "../../brave/android/java/org/chromium/chrome/browser/toolbar/top/BraveToolbarLayout.java",
+"../../brave/android/java/org/chromium/chrome/browser/ui/brave_tricks/checkbox_to_switch/CheckBoxPreference.java",
   "../../brave/android/java/org/chromium/chrome/browser/upgrade/BravePackageReplacedBroadcastReceiver.java",
   "../../brave/android/java/org/chromium/chrome/browser/upgrade/BraveUpgradeJobIntentService.java",
+  "../../brave/android/java/org/chromium/chrome/browser/upgrade/NotificationIntent.java",
   "../../brave/android/java/org/chromium/chrome/browser/util/BraveDbUtil.java",
   "../../brave/android/java/org/chromium/chrome/browser/util/BraveReferrer.java",
   "../../brave/android/java/org/chromium/chrome/browser/util/PackageUtils.java",
@@ -143,7 +142,7 @@ brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/shields/BraveShieldsUtils.java"
 ]
 
-if (brave_rewards_enabled) {
+if (brave_rewards_enabled || enable_brave_referrals) {
   brave_java_sources += brave_rewards_java_sources
 }
 

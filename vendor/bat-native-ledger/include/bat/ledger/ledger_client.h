@@ -56,7 +56,7 @@ using GetCreateScriptCallback =
     std::function<void(const std::string&, const int)>;
 
 using GetCredsBatchCallback = std::function<void(CredsBatchPtr)>;
-using GetAllCredsBatchCallback = std::function<void(CredsBatchList)>;
+using GetCredsBatchListCallback = std::function<void(CredsBatchList)>;
 using GetPromotionListCallback = std::function<void(PromotionList)>;
 
 using SKUOrderCallback =
@@ -189,6 +189,8 @@ class LEDGER_EXPORT LedgerClient {
   virtual void GetCreateScript(ledger::GetCreateScriptCallback callback) = 0;
 
   virtual void PendingContributionSaved(const ledger::Result result) = 0;
+
+  virtual void ClearAllNotifications() = 0;
 };
 
 }  // namespace ledger

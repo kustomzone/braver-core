@@ -3,12 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include <memory>
-#include <string>
-
-#include "base/memory/weak_ptr.h"
 #include "base/path_service.h"
-#include "base/run_loop.h"
 #include "base/strings/string_split.h"
 #include "base/strings/stringprintf.h"
 #include "base/test/bind_test_util.h"
@@ -17,23 +12,23 @@
 #include "brave/common/brave_paths.h"
 #include "brave/components/brave_rewards/browser/balance_report.h"
 #include "brave/components/brave_rewards/browser/rewards_service_impl.h"
-#include "brave/components/brave_rewards/browser/rewards_service_observer.h"
+#include "brave/components/brave_rewards/browser/test/common/rewards_browsertest_network_util.h"
+#include "brave/components/brave_rewards/browser/test/common/rewards_browsertest_response.h"
+#include "brave/components/brave_rewards/browser/test/common/rewards_browsertest_util.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/testing_profile.h"
+#include "net/dns/mock_host_resolver.h"
 
 // npm run test -- brave_browser_tests --filter=RewardsStateBrowserTest.*
 
-class RewardsStateBrowserTest
-    : public InProcessBrowserTest,
-      public brave_rewards::RewardsServiceObserver,
-      public base::SupportsWeakPtr<RewardsBrowserTest> {
+namespace rewards_browsertest {
+
+class RewardsStateBrowserTest : public InProcessBrowserTest {
  public:
   RewardsStateBrowserTest() {
-  }
-
-  ~RewardsStateBrowserTest() override {
+    response_ = std::make_unique<RewardsBrowserTestResponse>();
   }
 
   bool SetUpUserDataDirectory() override {
@@ -47,18 +42,41 @@ class RewardsStateBrowserTest
   void SetUpOnMainThread() override {
     InProcessBrowserTest::SetUpOnMainThread();
 
+    // HTTP resolver
+    https_server_.reset(new net::EmbeddedTestServer(
+        net::test_server::EmbeddedTestServer::TYPE_HTTPS));
+    https_server_->SetSSLConfig(net::EmbeddedTestServer::CERT_OK);
+    https_server_->RegisterRequestHandler(
+        base::BindRepeating(&rewards_browsertest_util::HandleRequest));
+    ASSERT_TRUE(https_server_->Start());
+
+    // Rewards service
     brave::RegisterPathProvider();
-
     profile_ = browser()->profile();
-
     rewards_service_ = static_cast<brave_rewards::RewardsServiceImpl*>(
         brave_rewards::RewardsServiceFactory::GetForProfile(profile_));
 
-    rewards_service_->AddObserver(this);
-    if (!rewards_service_->IsWalletInitialized()) {
-      WaitForWalletInitialization();
-    }
+    // Response mock
+    base::ScopedAllowBlockingForTesting allow_blocking;
+    response_->LoadMocks();
+    rewards_service_->ForTestingSetTestResponseCallback(
+        base::BindRepeating(
+            &RewardsStateBrowserTest::GetTestResponse,
+            base::Unretained(this)));
     rewards_service_->SetLedgerEnvForTesting();
+  }
+
+  void GetTestResponse(
+      const std::string& url,
+      int32_t method,
+      int* response_status_code,
+      std::string* response,
+      std::map<std::string, std::string>* headers) {
+    response_->Get(
+        url,
+        method,
+        response_status_code,
+        response);
   }
 
   void TearDown() override {
@@ -87,26 +105,6 @@ class RewardsStateBrowserTest
     ASSERT_GT(test_version, 0);
 
     *version = test_version - 1;
-  }
-
-  void WaitForWalletInitialization() {
-    if (wallet_initialized_) {
-      return;
-    }
-    wait_for_wallet_initialization_loop_.reset(new base::RunLoop);
-    wait_for_wallet_initialization_loop_->Run();
-  }
-
-  void OnWalletInitialized(
-      brave_rewards::RewardsService* rewards_service,
-      int32_t result) override {
-    const auto converted_result = static_cast<ledger::Result>(result);
-    ASSERT_TRUE(converted_result == ledger::Result::WALLET_CREATED ||
-                converted_result == ledger::Result::LEDGER_OK);
-    wallet_initialized_ = true;
-    if (wait_for_wallet_initialization_loop_) {
-      wait_for_wallet_initialization_loop_->Quit();
-    }
   }
 
   base::FilePath GetUserDataPath() const {
@@ -163,13 +161,13 @@ class RewardsStateBrowserTest
   }
 
   brave_rewards::RewardsServiceImpl* rewards_service_;
-
-  std::unique_ptr<base::RunLoop> wait_for_wallet_initialization_loop_;
-  bool wallet_initialized_ = false;
   Profile* profile_;
+  std::unique_ptr<net::EmbeddedTestServer> https_server_;
+  std::unique_ptr<RewardsBrowserTestResponse> response_;
 };
 
 IN_PROC_BROWSER_TEST_F(RewardsStateBrowserTest, State_1) {
+  rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
   EXPECT_EQ(
       profile_->GetPrefs()->GetInteger("brave.rewards.ac.min_visit_time"),
       5);
@@ -213,6 +211,7 @@ IN_PROC_BROWSER_TEST_F(RewardsStateBrowserTest, State_1) {
 }
 
 IN_PROC_BROWSER_TEST_F(RewardsStateBrowserTest, State_2) {
+  rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
   EXPECT_EQ(
       profile_->GetPrefs()->GetString("brave.rewards.wallet.payment_id"),
       "eea767c4-cd27-4411-afd4-78a9c6b54dbc");
@@ -247,3 +246,5 @@ IN_PROC_BROWSER_TEST_F(RewardsStateBrowserTest, State_2) {
       profile_->GetPrefs()->GetBoolean("brave.rewards.inline_tip.github"),
       false);
 }
+
+}  // namespace rewards_browsertest

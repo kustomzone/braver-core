@@ -3,14 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include <stdint.h>
-
-#include <memory>
-#include <string>
-
-#include "base/memory/weak_ptr.h"
 #include "base/path_service.h"
-#include "base/run_loop.h"
 #include "base/strings/string_split.h"
 #include "base/strings/stringprintf.h"
 #include "bat/ledger/internal/database/database_util.h"
@@ -18,26 +11,26 @@
 #include "brave/browser/brave_rewards/rewards_service_factory.h"
 #include "brave/common/brave_paths.h"
 #include "brave/components/brave_rewards/browser/rewards_service_impl.h"
-#include "brave/components/brave_rewards/browser/rewards_service_observer.h"
+#include "brave/components/brave_rewards/browser/test/common/rewards_browsertest_network_util.h"
+#include "brave/components/brave_rewards/browser/test/common/rewards_browsertest_response.h"
+#include "brave/components/brave_rewards/browser/test/common/rewards_browsertest_util.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/testing_profile.h"
+#include "net/dns/mock_host_resolver.h"
 #include "sql/database.h"
 #include "sql/meta_table.h"
 #include "sql/statement.h"
 
 // npm run test -- brave_browser_tests --filter=RewardsDatabaseBrowserTest.*
 
-class RewardsDatabaseBrowserTest
-    : public InProcessBrowserTest,
-      public brave_rewards::RewardsServiceObserver,
-      public base::SupportsWeakPtr<RewardsBrowserTest> {
+namespace rewards_browsertest {
+
+class RewardsDatabaseBrowserTest : public InProcessBrowserTest {
  public:
   RewardsDatabaseBrowserTest() {
-  }
-
-  ~RewardsDatabaseBrowserTest() override {
+    response_ = std::make_unique<RewardsBrowserTestResponse>();
   }
 
   bool SetUpUserDataDirectory() override {
@@ -50,18 +43,41 @@ class RewardsDatabaseBrowserTest
   void SetUpOnMainThread() override {
     InProcessBrowserTest::SetUpOnMainThread();
 
+    // HTTP resolver
+    https_server_.reset(new net::EmbeddedTestServer(
+        net::test_server::EmbeddedTestServer::TYPE_HTTPS));
+    https_server_->SetSSLConfig(net::EmbeddedTestServer::CERT_OK);
+    https_server_->RegisterRequestHandler(
+        base::BindRepeating(&rewards_browsertest_util::HandleRequest));
+    ASSERT_TRUE(https_server_->Start());
+
+    // Rewards service
     brave::RegisterPathProvider();
-
-    auto* browser_profile = browser()->profile();
-
+    auto* profile = browser()->profile();
     rewards_service_ = static_cast<brave_rewards::RewardsServiceImpl*>(
-        brave_rewards::RewardsServiceFactory::GetForProfile(browser_profile));
+        brave_rewards::RewardsServiceFactory::GetForProfile(profile));
 
-    rewards_service_->AddObserver(this);
-    if (!rewards_service_->IsWalletInitialized()) {
-      WaitForWalletInitialization();
-    }
+    // Response mock
+    base::ScopedAllowBlockingForTesting allow_blocking;
+    response_->LoadMocks();
+    rewards_service_->ForTestingSetTestResponseCallback(
+        base::BindRepeating(
+            &RewardsDatabaseBrowserTest::GetTestResponse,
+            base::Unretained(this)));
     rewards_service_->SetLedgerEnvForTesting();
+  }
+
+  void GetTestResponse(
+      const std::string& url,
+      int32_t method,
+      int* response_status_code,
+      std::string* response,
+      std::map<std::string, std::string>* headers) {
+    response_->Get(
+        url,
+        method,
+        response_status_code,
+        response);
   }
 
   void TearDown() override {
@@ -90,26 +106,6 @@ class RewardsDatabaseBrowserTest
     ASSERT_GT(test_version, 0);
 
     *version = test_version - 1;
-  }
-
-  void WaitForWalletInitialization() {
-    if (wallet_initialized_) {
-      return;
-    }
-    wait_for_wallet_initialization_loop_.reset(new base::RunLoop);
-    wait_for_wallet_initialization_loop_->Run();
-  }
-
-  void OnWalletInitialized(
-      brave_rewards::RewardsService* rewards_service,
-      int32_t result) override {
-    const auto converted_result = static_cast<ledger::Result>(result);
-    ASSERT_TRUE(converted_result == ledger::Result::WALLET_CREATED ||
-                converted_result == ledger::Result::LEDGER_OK);
-    wallet_initialized_ = true;
-    if (wait_for_wallet_initialization_loop_) {
-      wait_for_wallet_initialization_loop_->Quit();
-    }
   }
 
   base::FilePath GetUserDataPath() const {
@@ -172,9 +168,6 @@ class RewardsDatabaseBrowserTest
         &db_,
         braveledger_database::GetCurrentVersion(),
         braveledger_database::GetCompatibleVersion()));
-    ASSERT_EQ(
-        GetTableVersionNumber(),
-        braveledger_database::GetCurrentVersion());
   }
 
   std::string GetSchemaString() {
@@ -245,11 +238,10 @@ class RewardsDatabaseBrowserTest
   }
 
   brave_rewards::RewardsServiceImpl* rewards_service_;
-
-  std::unique_ptr<base::RunLoop> wait_for_wallet_initialization_loop_;
-  bool wallet_initialized_ = false;
   sql::Database db_;
   sql::MetaTable meta_table_;
+  std::unique_ptr<net::EmbeddedTestServer> https_server_;
+  std::unique_ptr<RewardsBrowserTestResponse> response_;
 };
 
 /**
@@ -287,9 +279,12 @@ IN_PROC_BROWSER_TEST_P(SchemaCheck, PerVersion) {
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB(param.version);
-
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
     const std::string schema = GetSchema();
     EXPECT_EQ(schema, GetSchemaString());
+    ASSERT_EQ(
+        GetTableVersionNumber(),
+        braveledger_database::GetCurrentVersion());
   }
 }
 
@@ -305,6 +300,7 @@ IN_PROC_BROWSER_TEST_F(RewardsDatabaseBrowserTest, Migration_4_ActivityInfo) {
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     ledger::PublisherInfoList list;
     const std::string query = "SELECT publisher_id, visits FROM activity_info";
@@ -328,6 +324,7 @@ IN_PROC_BROWSER_TEST_F(RewardsDatabaseBrowserTest, Migration_5_ActivityInfo) {
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     ledger::PublisherInfoList list;
     const std::string query = "SELECT publisher_id, visits FROM activity_info";
@@ -352,6 +349,7 @@ IN_PROC_BROWSER_TEST_F(RewardsDatabaseBrowserTest, Migration_6_ActivityInfo) {
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     ledger::PublisherInfoList list;
     const std::string query =
@@ -404,6 +402,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     auto pending_contribution = ledger::PendingContribution::New();
     pending_contribution->publisher_key = "reddit.com";
@@ -437,6 +436,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("contribution_info"), 5);
     EXPECT_EQ(CountTableRows("contribution_info_publishers"), 4);
@@ -485,6 +485,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("pending_contribution"), 4);
 
@@ -517,6 +518,7 @@ IN_PROC_BROWSER_TEST_F(RewardsDatabaseBrowserTest, Migration_13_Promotion) {
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("promotion"), 1);
   }
@@ -528,6 +530,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("unblinded_tokens"), 5);
 
@@ -564,6 +567,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("contribution_info"), 5);
 
@@ -588,6 +592,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("promotion"), 2);
 
@@ -618,6 +623,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("creds_batch"), 2);
 
@@ -671,6 +677,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("unblinded_tokens"), 80);
 
@@ -699,6 +706,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("contribution_info_publishers"), 4);
 
@@ -744,6 +752,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("contribution_queue"), 1);
 
@@ -794,6 +803,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("contribution_queue"), 1);
 
@@ -827,6 +837,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("unblinded_tokens"), 1);
 
@@ -863,6 +874,7 @@ IN_PROC_BROWSER_TEST_F(
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     InitDB();
+    rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
 
     EXPECT_EQ(CountTableRows("unblinded_tokens"), 10);
 
@@ -917,3 +929,5 @@ IN_PROC_BROWSER_TEST_F(
     EXPECT_EQ(token->redeem_type, ledger::RewardsType::ONE_TIME_TIP);
   }
 }
+
+}  // namespace rewards_browsertest

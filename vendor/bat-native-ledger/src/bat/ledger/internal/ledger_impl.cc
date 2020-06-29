@@ -23,6 +23,7 @@
 #include "bat/ledger/internal/bat_helper.h"
 #include "bat/ledger/internal/legacy/bat_state.h"
 #include "bat/ledger/internal/promotion/promotion.h"
+#include "bat/ledger/internal/recovery/recovery.h"
 #include "bat/ledger/internal/report/report.h"
 #include "bat/ledger/internal/ledger_impl.h"
 #include "bat/ledger/internal/media/helper.h"
@@ -98,25 +99,32 @@ LedgerImpl::~LedgerImpl() {
   }
 }
 
-void LedgerImpl::OnWalletInitializedInternal(
-    ledger::Result result,
+void LedgerImpl::OnInitialized(
+    const ledger::Result result,
     ledger::ResultCallback callback) {
   initializing_ = false;
   callback(result);
-  if (result == ledger::Result::LEDGER_OK ||
-      result == ledger::Result::WALLET_CREATED) {
+  if (result == ledger::Result::LEDGER_OK) {
     initialized_ = true;
-    bat_publisher_->SetPublisherServerListTimer(GetRewardsMainEnabled());
-    bat_contribution_->SetReconcileTimer();
-    bat_promotion_->Refresh(false);
-    bat_contribution_->Initialize();
-    bat_promotion_->Initialize();
-    bat_api_->Initialize();
-
-    SetConfirmationsWalletInfo();
+    StartServices();
   } else {
     BLOG(0, "Failed to initialize wallet " << result);
   }
+}
+
+void LedgerImpl::StartServices() {
+  if (!IsWalletCreated()) {
+    return;
+  }
+
+  bat_publisher_->SetPublisherServerListTimer(GetRewardsMainEnabled());
+  bat_contribution_->SetReconcileTimer();
+  bat_promotion_->Refresh(false);
+  bat_contribution_->Initialize();
+  bat_promotion_->Initialize();
+  bat_api_->Initialize();
+  SetConfirmationsWalletInfo();
+  braveledger_recovery::Check(this);
 }
 
 void LedgerImpl::Initialize(
@@ -137,7 +145,7 @@ void LedgerImpl::InitializeDatabase(
     const bool execute_create_script,
     ledger::ResultCallback callback) {
   ledger::ResultCallback finish_callback =
-      std::bind(&LedgerImpl::OnWalletInitializedInternal,
+      std::bind(&LedgerImpl::OnInitialized,
           this,
           _1,
           std::move(callback));
@@ -252,7 +260,7 @@ void LedgerImpl::ShutdownConfirmations() {
 }
 
 bool LedgerImpl::IsConfirmationsRunning() {
-  if (!bat_confirmations_) {
+  if (!bat_confirmations_ || !initialized_) {
     return false;
   }
 
@@ -260,16 +268,22 @@ bool LedgerImpl::IsConfirmationsRunning() {
 }
 
 void LedgerImpl::CreateWallet(ledger::ResultCallback callback) {
-  if (initializing_) {
-    return;
-  }
-
-  initializing_ = true;
-  auto on_wallet = std::bind(&LedgerImpl::OnWalletInitializedInternal,
+  auto create_callback = std::bind(&LedgerImpl::OnCreateWallet,
       this,
       _1,
-      std::move(callback));
-  bat_wallet_->CreateWalletIfNecessary(std::move(on_wallet));
+      callback);
+
+  bat_wallet_->CreateWalletIfNecessary(create_callback);
+}
+
+void LedgerImpl::OnCreateWallet(
+    const ledger::Result result,
+    ledger::ResultCallback callback) {
+  if (result == ledger::Result::WALLET_CREATED) {
+    StartServices();
+  }
+
+  callback(result);
 }
 
 void LedgerImpl::OnLoad(ledger::VisitDataPtr visit_data,
@@ -448,6 +462,11 @@ void LedgerImpl::LoadURL(
     const std::string& content_type,
     const ledger::UrlMethod method,
     ledger::LoadURLCallback callback) {
+  if (shutting_down_) {
+    BLOG(1,  url + " will not be executed as we are shutting down");
+    return;
+  }
+
   BLOG(5, ledger::UrlRequestToString(url, headers, content, content_type,
       method));
 
@@ -1496,7 +1515,8 @@ void LedgerImpl::PromotionCredentialCompleted(
   bat_database_->PromotionCredentialCompleted(promotion_id, callback);
 }
 
-void LedgerImpl::GetAllCredsBatches(ledger::GetAllCredsBatchCallback callback) {
+void LedgerImpl::GetAllCredsBatches(
+    ledger::GetCredsBatchListCallback callback) {
   bat_database_->GetAllCredsBatches(callback);
 }
 
@@ -1659,6 +1679,34 @@ void LedgerImpl::SaveProcessedPublisherList(
 
 void LedgerImpl::FetchParameters() {
   bat_api_->FetchParameters();
+}
+
+void LedgerImpl::Shutdown(ledger::ResultCallback callback) {
+  shutting_down_ = true;
+  ledger_client_->ClearAllNotifications();
+
+  auto disconnect_callback = std::bind(&LedgerImpl::ShutdownWallets,
+      this,
+      _1,
+      callback);
+
+  bat_wallet_->DisconnectAllWallets(disconnect_callback);
+}
+
+void LedgerImpl::ShutdownWallets(
+    const ledger::Result result,
+    ledger::ResultCallback callback) {
+  BLOG_IF(
+      1,
+      result != ledger::Result::LEDGER_OK,
+      "Not all wallets were disconnected");
+  bat_database_->FinishAllInProgressContributions(callback);
+}
+
+void LedgerImpl::GetCredsBatchesByTriggers(
+    const std::vector<std::string>& trigger_ids,
+    ledger::GetCredsBatchListCallback callback) {
+  bat_database_->GetCredsBatchesByTriggers(trigger_ids, callback);
 }
 
 }  // namespace bat_ledger

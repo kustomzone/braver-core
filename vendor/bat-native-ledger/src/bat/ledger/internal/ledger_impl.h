@@ -189,9 +189,6 @@ class LedgerImpl : public ledger::Ledger {
 
   void LoadPublisherState(ledger::OnLoadCallback callback);
 
-  void OnWalletInitializedInternal(ledger::Result result,
-                                   ledger::ResultCallback callback);
-
   void GetRewardsParameters(
       ledger::GetRewardsParametersCallback callback) override;
 
@@ -618,7 +615,7 @@ class LedgerImpl : public ledger::Ledger {
       const std::string& promotion_id,
       ledger::ResultCallback callback);
 
-  void GetAllCredsBatches(ledger::GetAllCredsBatchCallback callback);
+  void GetAllCredsBatches(ledger::GetCredsBatchListCallback callback);
 
   void GetPromotionList(
       const std::vector<std::string>& ids,
@@ -715,7 +712,19 @@ class LedgerImpl : public ledger::Ledger {
 
   void FetchParameters();
 
+  void Shutdown(ledger::ResultCallback callback) override;
+
+  void GetCredsBatchesByTriggers(
+      const std::vector<std::string>& trigger_ids,
+      ledger::GetCredsBatchListCallback callback);
+
  private:
+  void OnInitialized(
+      const ledger::Result result,
+      ledger::ResultCallback callback);
+
+  void StartServices();
+
   void OnStateInitialized(
       const ledger::Result result,
       ledger::ResultCallback callback);
@@ -740,6 +749,10 @@ class LedgerImpl : public ledger::Ledger {
   void ShutdownConfirmations();
 
   bool IsConfirmationsRunning();
+
+  void OnCreateWallet(
+      const ledger::Result result,
+      ledger::ResultCallback callback);
 
   void OnLoad(ledger::VisitDataPtr visit_data,
               const uint64_t& current_time) override;
@@ -797,6 +810,10 @@ class LedgerImpl : public ledger::Ledger {
       ledger::PublisherInfoCallback callback,
       const std::string& publisher_key);
 
+  void ShutdownWallets(
+      const ledger::Result result,
+      ledger::ResultCallback callback);
+
   ledger::LedgerClient* ledger_client_;
   std::unique_ptr<braveledger_promotion::Promotion> bat_promotion_;
   std::unique_ptr<braveledger_publisher::Publisher> bat_publisher_;
@@ -815,6 +832,7 @@ class LedgerImpl : public ledger::Ledger {
 
   bool initialized_;
   bool initializing_;
+  bool shutting_down_ = false;
 
   std::map<uint32_t, ledger::VisitData> current_pages_;
   uint64_t last_tab_active_time_;

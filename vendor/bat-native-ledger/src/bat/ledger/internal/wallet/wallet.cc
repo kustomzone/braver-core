@@ -265,6 +265,9 @@ std::string Wallet::GetClaimPayload(
     const std::string anon_address) {
   ledger::UnsignedTxProperties unsigned_tx;
   unsigned_tx.amount = user_funds;
+  if (unsigned_tx.amount.empty()) {
+    unsigned_tx.amount = "0";
+  }
   unsigned_tx.currency = "BAT";
   unsigned_tx.destination = new_address;
   const ledger::UnsignedTxState unsigned_tx_state;
@@ -303,8 +306,8 @@ std::string Wallet::GetClaimPayload(
   signed_tx.SetStringKey("octets", octets);
 
   base::Value denomination(base::Value::Type::DICTIONARY);
-  denomination.SetStringKey("amount", user_funds);
-  denomination.SetStringKey("currency", "BAT");
+  denomination.SetStringKey("amount", unsigned_tx.amount);
+  denomination.SetStringKey("currency", unsigned_tx.currency);
 
   base::Value body(base::Value::Type::DICTIONARY);
   body.SetStringKey("destination", new_address);
@@ -393,6 +396,36 @@ void Wallet::GetAnonWalletStatus(ledger::ResultCallback callback) {
     BLOG(0, "Wallet is corrupted");
     callback(ledger::Result::CORRUPTED_DATA);
     return;
+  }
+
+  callback(ledger::Result::LEDGER_OK);
+}
+
+void Wallet::DisconnectAllWallets(ledger::ResultCallback callback) {
+  auto wallet_callback = std::bind(&Wallet::OnDisconnectAllWallets,
+      this,
+      _1,
+      callback);
+
+  ledger_->GetExternalWallets(wallet_callback);
+}
+
+void Wallet::OnDisconnectAllWallets(
+    std::map<std::string, ledger::ExternalWalletPtr> wallets,
+    ledger::ResultCallback callback) {
+  if (wallets.empty()) {
+    BLOG(1, "No wallets");
+    callback(ledger::Result::LEDGER_OK);
+    return;
+  }
+
+  for (auto& wallet : wallets) {
+    auto wallet_new = ResetWallet(std::move(wallet.second));
+    if (!wallet_new) {
+      continue;
+    }
+
+    ledger_->SaveExternalWallet(wallet.first, std::move(wallet_new));
   }
 
   callback(ledger::Result::LEDGER_OK);

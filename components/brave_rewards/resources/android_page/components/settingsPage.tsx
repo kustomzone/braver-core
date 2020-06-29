@@ -51,7 +51,11 @@ class SettingsPage extends React.Component<Props, State> {
 
   onToggle = () => {
     this.setState({ mainToggle: !this.state.mainToggle })
-    this.actions.onSettingSave('enabledMain', !this.props.rewardsData.enabledMain)
+    if (this.props.rewardsData.initializing) {
+      return
+    }
+
+    this.actions.toggleEnableMain(!this.props.rewardsData.enabledMain)
   }
 
   onToggleWallet = () => {
@@ -76,13 +80,61 @@ class SettingsPage extends React.Component<Props, State> {
   }
 
   componentDidMount () {
+    this.actions.getRewardsMainEnabled()
+
     if (this.props.rewardsData.firstLoad === null) {
       // First load ever
-      this.actions.onSettingSave('firstLoad', true)
-      this.actions.getWalletPassphrase()
+      this.actions.onSettingSave('firstLoad', true, false)
     } else if (this.props.rewardsData.firstLoad) {
       // Second load ever
-      this.actions.onSettingSave('firstLoad', false)
+      this.actions.onSettingSave('firstLoad', false, false)
+    }
+
+    if (this.props.rewardsData.enabledMain &&
+        !this.props.rewardsData.initializing) {
+      this.startRewards()
+    }
+  }
+
+  componentDidUpdate (prevProps: Props) {
+    if (
+      this.props.rewardsData.enabledMain &&
+      prevProps.rewardsData.initializing &&
+      !this.props.rewardsData.initializing
+    ) {
+      this.startRewards()
+    }
+
+    if (
+      prevProps.rewardsData.enabledMain &&
+      !this.props.rewardsData.enabledMain
+    ) {
+      this.stopRewards()
+    }
+
+    if (
+      !prevProps.rewardsData.enabledContribute &&
+      this.props.rewardsData.enabledContribute
+    ) {
+      this.actions.getContributeList()
+      this.actions.getReconcileStamp()
+    }
+
+    if (
+      !prevProps.rewardsData.adsData.adsEnabled &&
+      this.props.rewardsData.adsData.adsEnabled
+    ) {
+      this.actions.getTransactionHistory()
+    }
+  }
+
+  startRewards () {
+    if (this.props.rewardsData.firstLoad) {
+      this.actions.getAdsData()
+      this.actions.getWalletPassphrase()
+    } else {
+      // normal load
+      this.refreshActions()
     }
 
     this.actions.getRewardsParameters()
@@ -92,16 +144,8 @@ class SettingsPage extends React.Component<Props, State> {
       this.actions.getBalance()
     }, 60000)
 
-    if (this.props.rewardsData.firstLoad === false) {
-      this.refreshActions()
-    } else {
-      this.actions.getAdsData()
-    }
-
-    this.isWalletUrl()
-
     this.actions.fetchPromotions()
-
+    this.isWalletUrl()
     window.addEventListener('popstate', (e) => {
       this.isWalletUrl()
     })
@@ -110,27 +154,9 @@ class SettingsPage extends React.Component<Props, State> {
     })
   }
 
-  componentDidUpdate (prevProps: Props) {
-    if (
-      !prevProps.rewardsData.enabledMain &&
-      this.props.rewardsData.enabledMain
-    ) {
-      this.refreshActions()
-    }
-
-    if (
-      !prevProps.rewardsData.adsData.adsEnabled &&
-      this.props.rewardsData.adsData.adsEnabled
-    ) {
-      this.actions.getTransactionHistory()
-    }
-
-    if (
-      !prevProps.rewardsData.enabledContribute &&
-      this.props.rewardsData.enabledContribute
-    ) {
-      this.actions.getContributeList()
-    }
+  stopRewards () {
+    clearInterval(this.balanceTimerId)
+    this.balanceTimerId = -1
   }
 
   isWalletUrl = () => {
@@ -175,7 +201,7 @@ class SettingsPage extends React.Component<Props, State> {
   }
 
   componentWillUnmount () {
-    clearInterval(this.balanceTimerId)
+    this.stopRewards()
   }
 
   render () {

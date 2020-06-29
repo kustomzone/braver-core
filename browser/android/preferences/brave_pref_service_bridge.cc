@@ -61,27 +61,34 @@ namespace android {
 void JNI_BravePrefServiceBridge_SetHTTPSEEnabled(
     JNIEnv* env,
     jboolean enabled) {
-  brave_shields::SetHTTPSEverywhereEnabled(GetOriginalProfile(),
-                                           enabled,
-                                           GURL());
+  brave_shields::SetHTTPSEverywhereEnabled(
+      HostContentSettingsMapFactory::GetForProfile(
+          GetOriginalProfile()),
+      enabled,
+      GURL(),
+      g_browser_process->local_state());
 }
 
 void JNI_BravePrefServiceBridge_SetAdBlockEnabled(
     JNIEnv* env,
     jboolean enabled) {
   brave_shields::SetAdControlType(
-      GetOriginalProfile(),
+      HostContentSettingsMapFactory::GetForProfile(
+          GetOriginalProfile()),
       static_cast<bool>(enabled) ? ControlType::BLOCK : ControlType::ALLOW,
-      GURL());
+      GURL(),
+      g_browser_process->local_state());
 }
 
 void JNI_BravePrefServiceBridge_SetFingerprintingProtectionEnabled(
     JNIEnv* env,
     jboolean enabled) {
   brave_shields::SetFingerprintingControlType(
-      GetOriginalProfile(),
+      HostContentSettingsMapFactory::GetForProfile(
+          GetOriginalProfile()),
       static_cast<bool>(enabled) ? ControlType::BLOCK : ControlType::ALLOW,
-      GURL());
+      GURL(),
+      g_browser_process->local_state());
 }
 
 void JNI_BravePrefServiceBridge_SetPlayYTVideoInBrowserEnabled(
@@ -189,6 +196,13 @@ void JNI_BravePrefServiceBridge_SetSafetynetCheckFailed(
 
 jboolean JNI_BravePrefServiceBridge_GetSafetynetCheckFailed(JNIEnv* env) {
   return GetOriginalProfile()->GetPrefs()->GetBoolean(kSafetynetCheckFailed);
+}
+
+void JNI_BravePrefServiceBridge_SetSafetynetStatus(
+    JNIEnv* env,
+    const JavaParamRef<jstring>& status) {
+  g_browser_process->local_state()->SetString(
+      kSafetynetStatus, ConvertJavaStringToUTF8(env, status));
 }
 
 void JNI_BravePrefServiceBridge_SetUseRewardsStagingServer(

@@ -203,6 +203,11 @@ void Database::UpdateContributionInfoContributedAmount(
       callback);
 }
 
+void Database::FinishAllInProgressContributions(
+    ledger::ResultCallback callback) {
+  contribution_info_->FinishAllInProgressRecords(callback);
+}
+
 /**
  * CONTRIBUTION QUEUE
  */
@@ -245,7 +250,7 @@ void Database::SaveSignedCreds(
   creds_batch_->SaveSignedCreds(std::move(info), callback);
 }
 
-void Database::GetAllCredsBatches(ledger::GetAllCredsBatchCallback callback) {
+void Database::GetAllCredsBatches(ledger::GetCredsBatchListCallback callback) {
   creds_batch_->GetAllRecords(callback);
 }
 
@@ -267,6 +272,12 @@ void Database::UpdateCredsBatchesStatus(
       trigger_type,
       status,
       callback);
+}
+
+void Database::GetCredsBatchesByTriggers(
+    const std::vector<std::string>& trigger_ids,
+    ledger::GetCredsBatchListCallback callback) {
+  creds_batch_->GetRecordsByTriggers(trigger_ids, callback);
 }
 
 /**
